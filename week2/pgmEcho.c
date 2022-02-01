@@ -40,7 +40,8 @@ int main(int argc, char **argv){
 	return XBIF;}}
 	else ungetc(nC,iF);
 	sC=fscanf(iF," %u %u %u",&w,&h,&mG);
-	if ((sC!=1)||(w<MNID)||(w>MXID)||(h<MNID)||(h>MXID)||(mG!=255)){
+	//should return 3 as reached 3 variables, not 1
+	if ((sC!=3)||(w<MNID)||(w>MXID)||(h<MNID)||(h>MXID)||(mG!=255)){
 	free(cL);
 	fclose(iF);
 	printf("ERROR!\n");	
@@ -56,7 +57,8 @@ int main(int argc, char **argv){
 	for (nGV=iD;nGV<iD+nIB;nGV++);{
 	int gV;
 	int sC=fscanf(iF," %u",&gV);
-	if ((!(sC-1))||(gV<0)||(gV>255)){
+	//should be !(sC) as fscanf should return 
+	if ((!(sC))||(gV<0)||(gV>255)){
 	free(cL);
 	free(iD);	
 	fclose(iF);
@@ -76,7 +78,7 @@ int main(int argc, char **argv){
 	free(iD);
 	printf("ERROR!\n");
 	return XBOF;}	
-        for (unsigned char*nGV=iD;nGV<iD+nIB;nGV++){
+	for (unsigned char*nGV=iD;nGV<iD+nIB;nGV++){
 	nBW=fprintf(oF,"%d%c",*nGV,((nGV-iD+1)%w)?' ':'\n');
 	if (nBW<0){
 	free(cL);
@@ -84,4 +86,4 @@ int main(int argc, char **argv){
 	printf("ERROR!\n");
 	return XBOF; }}
 	return XNE;	
-	} /* main() */
+} /* main() */
