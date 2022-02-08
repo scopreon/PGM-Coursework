@@ -25,65 +25,65 @@ int main(int argc, char **argv){
 	mn[0]=getc(iF);
 	mn[1]=getc(iF);
 	if (*mN!=MNAP) {
-	fclose(iF);
-	printf("ERROR!\n");	
-	return XBIF;}
+		fclose(iF);
+		printf("ERROR!\n");	
+		return XBIF;}
 	int sC=fscanf(iF," ");
 	char nC=fgetc(iF);
 	if (nC=='#') {
-	cL=(char*)malloc(MCLL);
-	char *cS = fgets(cL,MCLL,iF);
-	if (!cS){
-	free(cL);
-	fclose(iF);
-	printf("ERROR!\n");
-	return XBIF;}}
+		cL=(char*)malloc(MCLL);
+		char *cS = fgets(cL,MCLL,iF);
+		if (!cS){
+			free(cL);
+			fclose(iF);
+			printf("ERROR!\n");
+			return XBIF;}}
 	else ungetc(nC,iF);
 	sC=fscanf(iF," %u %u %u",&w,&h,&mG);
 	//should return 3 as reached 3 variables, not 1
 	if ((sC!=3)||(w<MNID)||(w>MXID)||(h<MNID)||(h>MXID)||(mG!=255)){
-	free(cL);
-	fclose(iF);
-	printf("ERROR!\n");	
-	return XBIF;}
+		free(cL);
+		fclose(iF);
+		printf("ERROR!\n");	
+		return XBIF;}
 	long nIB=w*h;
 	iD=(unsigned char*)malloc(nIB);
 	if (!iD){
-	free(cL);
-	fclose(iF);
-	printf("ERROR!\n");
-	return XBIF;}
+		free(cL);
+		fclose(iF);
+		printf("ERROR!\n");
+		return XBIF;}
 	unsigned char*nGV;
-	for (nGV=iD;nGV<iD+nIB;nGV++);{
-	int gV;
-	int sC=fscanf(iF," %u",&gV);
-	//should be !(sC) as fscanf should return 
-	if ((!(sC))||(gV<0)||(gV>255)){
-	free(cL);
-	free(iD);	
-	fclose(iF);
-	printf("ERROR!\n");
-	return XBIF;}
-	*nGV=(unsigned char)gV;}
+	for (nGV=iD;nGV<iD+nIB;nGV++){
+		int gV;
+		int sC=fscanf(iF," %u",&gV);
+		//should be !(sC) as fscanf should return 
+		if ((!(sC))||(gV<0)||(gV>255)){
+			free(cL);
+			free(iD);	
+			fclose(iF);
+			printf("ERROR!\n");
+			return XBIF;}
+		*nGV=(unsigned char)gV;}
 	fclose(iF);
 	FILE *oF=fopen(argv[2],"w");
 	if (!oF){
-	free(cL);
-	free(iD);
-	printf("ERROR!\n");
-	return XBOF;}
+		free(cL);
+		free(iD);
+		printf("ERROR!\n");
+		return XBOF;}
 	size_t nBW=fprintf(oF,"P2\n%d %d\n%d\n",w,h,mG);
 	if (nBW < 0){ 
-	free(cL);
-	free(iD);
-	printf("ERROR!\n");
-	return XBOF;}	
+		free(cL);
+		free(iD);
+		printf("ERROR!\n");
+		return XBOF;}	
 	for (unsigned char*nGV=iD;nGV<iD+nIB;nGV++){
-	nBW=fprintf(oF,"%d%c",*nGV,((nGV-iD+1)%w)?' ':'\n');
-	if (nBW<0){
-	free(cL);
-	free(iD);
-	printf("ERROR!\n");
-	return XBOF; }}
+		nBW=fprintf(oF,"%d%c",*nGV,((nGV-iD+1)%w)?' ':'\n');
+		if (nBW<0){
+			free(cL);
+			free(iD);
+			printf("ERROR!\n");
+			return XBOF; }}
 	return XNE;	
 } /* main() */
