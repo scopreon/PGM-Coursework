@@ -20,7 +20,7 @@
 
 /* library for memory routines     */
 #include <stdlib.h>
-#include "image.h"
+#include "fileCheck.h"
 #define EXIT_NO_ERRORS 0
 #define EXIT_WRONG_ARG_COUNT 1
 #define EXIT_BAD_INPUT_FILE 2
@@ -63,34 +63,26 @@ int main(int argc, char **argv)
 	/* problems with endianness	         */
 	/* Raw:    0x5035 or P5		         */
 	/* ASCII:  0x5032 or P2		         */
-	// unsigned char magic_number[2] = {'0','0'};
-	// unsigned short *magic_Number = (unsigned short *) magic_number;
+	unsigned char magic_number[2] = {'0','0'};
+	unsigned short *magic_Number = (unsigned short *) magic_number;
 	
-	// /* we will store ONE comment	         */
-	// char *commentLine = NULL;
+	/* we will store ONE comment	         */
+	char *commentLine = NULL;
 
-	// /* the logical width & height	         */
-	// /* note: cannot be negative	         */
-	// unsigned int width = 0, height = 0;
+	/* the logical width & height	         */
+	/* note: cannot be negative	         */
+	unsigned int width = 0, height = 0;
 
-	// /* maximum gray value (assumed)	         */
-	// /* make it an integer for ease	         */
-	// unsigned int maxGray = 255;
+	/* maximum gray value (assumed)	         */
+	/* make it an integer for ease	         */
+	unsigned int maxGray = 255;
 
-	// /* pointer to raw image data	         */
-	// unsigned char *imageData = NULL;
+	/* pointer to raw image data	         */
+	unsigned char *imageData = NULL;
 	
 	/* now start reading in the data         */
 	/* try to open the file for text I/O     */
 	/* in ASCII mode b/c the header is text  */
-	struct Images img1={.commentLine=NULL,.width=0,.height=0,.maxGray=255,.imageData=NULL};
-
-    img1.magic_number[0] = '0';
-    img1.magic_Number[1] = '0';
-
-    img1.magic_Number = (unsigned short *) img1.magic_number;
-
-
 	FILE *inputFile = fopen(argv[1], "r");
 
 	/* if it fails, return error code        */
@@ -98,11 +90,12 @@ int main(int argc, char **argv)
 		return EXIT_BAD_INPUT_FILE;
 
 	/* read in the magic number              */
-	img1.magic_number[0] = getc(inputFile);
-	img1.magic_number[1] = getc(inputFile);
+	magic_number[0] = getc(inputFile);
+	magic_number[1] = getc(inputFile);
 
 	/* sanity check on the magic number      */
-	if (*img1.magic_Number != MAGIC_NUMBER_ASCII_PGM)
+	//if (*magic_Number != MAGIC_NUMBER_ASCII_PGM)
+	if(magicNumberCheck(*magic_Number,MAGIC_NUMBER_ASCII_PGM))
 		{ /* failed magic number check   */
 		/* be tidy: close the file       */
 		fclose(inputFile);
@@ -122,15 +115,15 @@ int main(int argc, char **argv)
 	if (nextChar == '#')
 		{ /* comment line                */
 		/* allocate buffer               */
-		img1.commentLine = (char *) malloc(MAX_COMMENT_LINE_LENGTH);
+		commentLine = (char *) malloc(MAX_COMMENT_LINE_LENGTH);
 		/* fgets() reads a line          */
 		/* capture return value          */
-		char *commentString = fgets(img1.commentLine, MAX_COMMENT_LINE_LENGTH, inputFile);
+		char *commentString = fgets(commentLine, MAX_COMMENT_LINE_LENGTH, inputFile);
 		/* NULL means failure            */
 		if (commentString == NULL)
 			{ /* NULL comment read   */
 			/* free memory           */
-			free(img1.commentLine);
+			free(commentLine);
 			/* close file            */
 			fclose(inputFile);
 
@@ -149,21 +142,21 @@ int main(int argc, char **argv)
 
 	/* read in width, height, grays          */
 	/* whitespace to skip blanks             */
-	scanCount = fscanf(inputFile, " %u %u %u", &(img1.width), &(img1.height), &(img1.maxGray));
+	scanCount = fscanf(inputFile, " %u %u %u", &(width), &(height), &(maxGray));
 
 	/* sanity checks on size & grays         */
 	/* must read exactly three values        */
 	if 	(
 		(scanCount != 3				)	||
-		(img1.width 	< MIN_IMAGE_DIMENSION	) 	||
-		(img1.width 	> MAX_IMAGE_DIMENSION	) 	||
-		(img1.height < MIN_IMAGE_DIMENSION	) 	||
-		(img1.height > MAX_IMAGE_DIMENSION	) 	||
-		(img1.maxGray	!= 255		)
+		(width 	< MIN_IMAGE_DIMENSION	) 	||
+		(width 	> MAX_IMAGE_DIMENSION	) 	||
+		(height < MIN_IMAGE_DIMENSION	) 	||
+		(height > MAX_IMAGE_DIMENSION	) 	||
+		(maxGray	!= 255		)
 		)
 		{ /* failed size sanity check    */
 		/* free up the memory            */
-		free(img1.commentLine);
+		free(commentLine);
 
 		/* be tidy: close file pointer   */
 		fclose(inputFile);
@@ -176,14 +169,14 @@ int main(int argc, char **argv)
 		} /* failed size sanity check    */
 
 	/* allocate the data pointer             */
-	long nImageBytes = img1.width * img1.height * sizeof(unsigned char);
-	img1.imageData = (unsigned char *) malloc(nImageBytes);
+	long nImageBytes = width * height * sizeof(unsigned char);
+	imageData = (unsigned char *) malloc(nImageBytes);
 
 	/* sanity check for memory allocation    */
-	if (img1.imageData == NULL)
+	if (imageData == NULL)
 		{ /* malloc failed */
 		/* free up memory                */
-		free(img1.commentLine);
+		free(commentLine);
 
 		/* close file pointer            */
 		fclose(inputFile);
@@ -196,7 +189,7 @@ int main(int argc, char **argv)
 		} /* malloc failed */
 
 	/* pointer for efficient read code       */
-	for (unsigned char *nextGrayValue = img1.imageData; nextGrayValue < img1.imageData + nImageBytes; nextGrayValue++)
+	for (unsigned char *nextGrayValue = imageData; nextGrayValue < imageData + nImageBytes; nextGrayValue++)
 		{ /* per gray value */
 		/* read next value               */
 		int grayValue = -1;
@@ -206,8 +199,8 @@ int main(int argc, char **argv)
 		if ((scanCount != 1) || (grayValue < 0) || (grayValue > 255))
 			{ /* fscanf failed */
 			/* free memory           */
-			free(img1.commentLine);
-			free(img1.imageData);	
+			free(commentLine);
+			free(imageData);	
 
 			/* close file            */
 			fclose(inputFile);
@@ -233,8 +226,8 @@ int main(int argc, char **argv)
 	if (outputFile == NULL)
 		{ /* NULL output file */
 		/* free memory                   */
-		free(img1.commentLine);
-		free(img1.imageData);
+		free(commentLine);
+		free(imageData);
 
 		/* print an error message        */
 		printf("Error: Failed to write pgm image to file %s\n", argv[2]);	
@@ -244,14 +237,14 @@ int main(int argc, char **argv)
 		} /* NULL output file */
 	
 	/* write magic number, size & gray value */
-	size_t nBytesWritten = fprintf(outputFile, "P2\n%d %d\n%d\n", img1.width, img1.height, img1.maxGray);
+	size_t nBytesWritten = fprintf(outputFile, "P2\n%d %d\n%d\n", width, height, maxGray);
 
 	/* check that dimensions wrote correctly */
 	if (nBytesWritten < 0)
 		{ /* dimensional write failed    */
 		/* free memory                   */
-		free(img1.commentLine);
-		free(img1.imageData);
+		free(commentLine);
+		free(imageData);
 
 		/* print an error message        */
 		printf("Error: Failed to write pgm image to file %s\n", argv[2]);	
@@ -261,10 +254,10 @@ int main(int argc, char **argv)
 		} /* dimensional write failed    */
 
         /* pointer for efficient write code      */
-        for (unsigned char *nextGrayValue = img1.imageData; nextGrayValue < img1.imageData + nImageBytes; nextGrayValue++)
+        for (unsigned char *nextGrayValue = imageData; nextGrayValue < imageData + nImageBytes; nextGrayValue++)
                 { /* per gray value */
 		/* get next char's column        */
-		int nextCol = (nextGrayValue - img1.imageData + 1) % img1.width;
+		int nextCol = (nextGrayValue - imageData + 1) % width;
 
 		/* write the entry & whitespace  */
 		nBytesWritten = fprintf(outputFile, "%d%c", *nextGrayValue, (nextCol ? ' ' : '\n') );
@@ -273,8 +266,8 @@ int main(int argc, char **argv)
 		if (nBytesWritten < 0)
 			{ /* data write failed   */
 			/* free memory           */
-			free(img1.commentLine);
-			free(img1.imageData);
+			free(commentLine);
+			free(imageData);
 
 			/* print error message   */
 			printf("Error: Failed to write pgm image to file %s\n", argv[2]);	
