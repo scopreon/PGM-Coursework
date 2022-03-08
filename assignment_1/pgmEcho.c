@@ -94,51 +94,60 @@ int main(int argc, char **argv)
 	magic_number[1] = getc(inputFile);
 
 	/* sanity check on the magic number      */
-	//if (*magic_Number != MAGIC_NUMBER_ASCII_PGM)
-	if(magicNumberCheck(*magic_Number,MAGIC_NUMBER_ASCII_PGM))
-		{ /* failed magic number check   */
-		/* be tidy: close the file       */
-		fclose(inputFile);
+	if(magicNumberCheck(inputFile,*magic_Number, MAGIC_NUMBER_ASCII_PGM, argv[1]))
 
-		/* print an error message */
-		printf("Error: Failed to read pgm image from file %s\n", argv[1]);	
-		
-		/* and return                    */
+		{
 		return EXIT_BAD_INPUT_FILE;
-		} /* failed magic number check   */
+		}
 
 	/* scan whitespace if present            */
 	int scanCount = fscanf(inputFile, " ");
 
-	/* check for a comment line              */
-	char nextChar = fgetc(inputFile);
-	if (nextChar == '#')
-		{ /* comment line                */
-		/* allocate buffer               */
-		commentLine = (char *) malloc(MAX_COMMENT_LINE_LENGTH);
-		/* fgets() reads a line          */
-		/* capture return value          */
-		char *commentString = fgets(commentLine, MAX_COMMENT_LINE_LENGTH, inputFile);
-		/* NULL means failure            */
-		if (commentString == NULL)
-			{ /* NULL comment read   */
-			/* free memory           */
-			free(commentLine);
-			/* close file            */
-			fclose(inputFile);
+	// /* check for a comment line              */
+	// char nextChar = fgetc(inputFile);
 
-			/* print an error message */
-			printf("Error: Failed to read pgm image from file %s\n", argv[1]);	
+	// //commentLine=commentLine(MAX_COMMENT_LINE_LENGTH,commentLine,inputFile);
+	// if (nextChar == '#')
+	// 	{ /* comment line                */
+	// 	/* allocate buffer               */
+	// 	commentLine = (char *) malloc(MAX_COMMENT_LINE_LENGTH);
+	// 	/* fgets() reads a line          */
+	// 	/* capture return value          */
+	// 	char *commentString = fgets(commentLine, MAX_COMMENT_LINE_LENGTH, inputFile);
+	// 	/* NULL means failure            */
+	// 	if (commentString == NULL)
+	// 		{ /* NULL comment read   */
+	// 		/* free memory           */
+	// 		free(commentLine);
+	// 		/* close file            */
+	// 		fclose(inputFile);
+
+	// 		/* print an error message */
+	// 		printf("Error: Failed to read pgm image from file %s\n", argv[1]);	
 		
-			/* and return            */
+	// 		/* and return            */
+	// 		return EXIT_BAD_INPUT_FILE;
+	// 		} /* NULL comment read   */
+	// 	} /* comment line */
+	// else
+	// 	{ /* not a comment line */
+	// 	/* put character back            */
+	// 	ungetc(nextChar, inputFile);
+	// 	} /* not a comment line */
+	char nextChar = fgetc(inputFile);
+	switch(getCommentLine(MAX_COMMENT_LINE_LENGTH,commentLine,inputFile,argv[1])){
+		case 0:
 			return EXIT_BAD_INPUT_FILE;
-			} /* NULL comment read   */
-		} /* comment line */
-	else
-		{ /* not a comment line */
-		/* put character back            */
-		ungetc(nextChar, inputFile);
-		} /* not a comment line */
+			break;
+		case 1:
+			commentLine = (char *) malloc(MAX_COMMENT_LINE_LENGTH);
+			char *commentString = fgets(commentLine, MAX_COMMENT_LINE_LENGTH, inputFile);
+			break;
+		case 2:
+			printf("wtaf");
+			ungetc(nextChar, inputFile);
+			break;
+	}
 
 	/* read in width, height, grays          */
 	/* whitespace to skip blanks             */

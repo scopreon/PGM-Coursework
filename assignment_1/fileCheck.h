@@ -1,6 +1,2 @@
-#ifndef FOO_H_   /* Include guard */
-#define FOO_H_
-
-int magicNumberCheck(unsigned short,int);
-
-#endif // FOO_H_
+int magicNumberCheck(FILE *inputFile,unsigned short magic_Number, int MAGIC_NUMBER_ASCII_PGM, char *arg1);
+int getCommentLine(int MAX_COMMENT_LINE_LENGTH,char *commentLine,FILE *inputFile, char *arg1);
