@@ -1,7 +1,7 @@
 #ifndef IMAGE_STRUCT
 #define IMAGE_STRUCT
 
-struct image
+struct Images
 { 
     char *commentLine;
     unsigned short *magic_Number;
