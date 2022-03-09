@@ -19,7 +19,6 @@ int magicNumberCheck(FILE *inputFile,unsigned short magic_Number, int MAGIC_NUMB
 
 int getCommentLine(int MAX_COMMENT_LINE_LENGTH,char *commentLine,FILE *inputFile, char *arg1){
     char nextChar = fgetc(inputFile);
-    printf("%c",nextChar);
     if (nextChar == '#')
 		{ /* comment line                */
 		/* allocate buffer               */
@@ -39,14 +38,15 @@ int getCommentLine(int MAX_COMMENT_LINE_LENGTH,char *commentLine,FILE *inputFile
 			printf("Comment %s\n", arg1);	
 		
 			/* and return            */
-			return 0;
+			return 1;
 			} /* NULL comment read   */
         else{
-            return 1;
+            return 0;
         }
 	} /* comment line */
     else{
-        return 2;
+        
+        return 0;
     }
 }
 

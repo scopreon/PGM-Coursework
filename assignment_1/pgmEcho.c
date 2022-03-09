@@ -134,19 +134,9 @@ int main(int argc, char **argv)
 	// 	/* put character back            */
 	// 	ungetc(nextChar, inputFile);
 	// 	} /* not a comment line */
-	char nextChar = fgetc(inputFile);
-	switch(getCommentLine(MAX_COMMENT_LINE_LENGTH,commentLine,inputFile,argv[1])){
-		case 0:
-			return EXIT_BAD_INPUT_FILE;
-			break;
-		case 1:
-			commentLine = (char *) malloc(MAX_COMMENT_LINE_LENGTH);
-			char *commentString = fgets(commentLine, MAX_COMMENT_LINE_LENGTH, inputFile);
-			break;
-		case 2:
-			printf("wtaf");
-			ungetc(nextChar, inputFile);
-			break;
+//	char nextChar = fgetc(inputFile);
+	if(getCommentLine(MAX_COMMENT_LINE_LENGTH,commentLine,inputFile,argv[1])){
+		return EXIT_BAD_INPUT_FILE;
 	}
 
 	/* read in width, height, grays          */

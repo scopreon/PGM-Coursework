@@ -1,2 +1,2 @@
 pgmEcho: pgmEcho.c fileCheck.c
-	gcc -o pgmEcho pgmEcho.c fileCheck.c -I.
+	gcc -std=c99 -o pgmEcho pgmEcho.c fileCheck.c -I.
