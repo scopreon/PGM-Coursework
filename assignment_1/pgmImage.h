@@ -11,6 +11,7 @@ typedef struct Image{
     char *fileName;
     unsigned char *imageData;
     unsigned short *magic_Number;
+    unsigned char magic_number[2];
 }image;
 
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "pgmImage.h"
 #include "fileCheck.h"
 
@@ -26,22 +27,36 @@ int readData(image *ptr_img,long nImageBytes){
 		
 		return 1;
 	}
+	if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
+		getc(ptr_img->inputFile);
+	}
 	for (unsigned char *nextGrayValue = ptr_img->imageData; nextGrayValue < ptr_img->imageData + nImageBytes; nextGrayValue++)
 		{
 		int grayValue = -1;
-		int scanCount = fscanf(ptr_img->inputFile, " %u", &grayValue);
-
-		if ((scanCount != 1) || (grayValue < 0) || (grayValue > ptr_img->maxGray))
-			{
-			free(ptr_img->commentLine);
-			free(ptr_img->imageData);	
-
-			fclose(ptr_img->inputFile);
-
-			printf("Error: Failed to read pgm image from file %s\n", ptr_img->fileName);	
+		if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
+			//*nextGrayValue = (char) (((int) *nextGrayValue)/ptr_img->maxGray * 255);
+			int scanCount = fread(&grayValue,1,1,ptr_img->inputFile);
+			//grayValue=(((int) grayValue)/ptr_img->maxGray * 255);
+			printf("%u\n", grayValue);
+			
+		}
+		else{
+			int scanCount = fscanf(ptr_img->inputFile, " %u", &grayValue);
+		}
 		
-			return 1;
-			}
+		
+		
+		// if ((scanCount != 1) || (grayValue < 0) || (grayValue > ptr_img->maxGray))
+		// 	{
+		// 	free(ptr_img->commentLine);
+		// 	free(ptr_img->imageData);	
+
+		// 	fclose(ptr_img->inputFile);
+
+		// 	printf("Error: Failed to read pgm image from file %s\n", ptr_img->fileName);	
+		
+		// 	return 1;
+		// 	}
 
 		*nextGrayValue = (unsigned char) grayValue;
 		}
@@ -57,8 +72,10 @@ int writeData(image *ptr_img,long nImageBytes){
 
 		return 1;
 		}
-	
-	size_t nBytesWritten = fprintf(ptr_img->outputFile, "P2\n%d %d\n%d\n", ptr_img->width, ptr_img->height, ptr_img->maxGray);
+	// char magicNumber[3];
+	// memcpy(magicNumber, (char *) ptr_img->magic_Number , 2);
+	// printf("%s",magicNumber);
+	size_t nBytesWritten = fprintf(ptr_img->outputFile, "%s\n%d %d\n%d\n", ptr_img->magic_Number,ptr_img->width, ptr_img->height, ptr_img->maxGray);
     if (nBytesWritten < 0)
 		{ /* dimensional write failed    */
 		/* free memory                   */
@@ -75,10 +92,19 @@ int writeData(image *ptr_img,long nImageBytes){
             { /* per gray value */
 		/* get next char's column        */
 		int nextCol = (nextGrayValue - ptr_img->imageData + 1) % ptr_img->width;
-
+		//printf("%x ", *nextGrayValue);
 		/* write the entry & whitespace  */
-		nBytesWritten = fprintf(ptr_img->outputFile, "%d%c", *nextGrayValue, (nextCol ? ' ' : '\n') );
 
+		
+		if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
+			//*nextGrayValue = (char) (((int) *nextGrayValue)/ptr_img->maxGray * 255);
+			//*nextGrayValue=(int) (((float) *nextGrayValue)/ptr_img->maxGray *255);
+			nBytesWritten = fwrite(nextGrayValue, 1, 1, ptr_img->outputFile);
+		}
+		else{
+			nBytesWritten = fprintf(ptr_img->outputFile, "%d%c", *nextGrayValue, (nextCol ? ' ' : '\n') );
+		}
+		
 		/* sanity check on write         */
 		if (nBytesWritten < 0)
 			{ /* data write failed   */
@@ -97,21 +123,22 @@ int writeData(image *ptr_img,long nImageBytes){
 }
 
 int readInFile(image *ptr_img, char *fileName){
-    unsigned char magic_number[2] = {'0','0'};
-	ptr_img->magic_Number=(unsigned short *) magic_number;
-	unsigned short *magic_Number = (unsigned short *) magic_number;
+	// unsigned char magic_number[2] = {'0','0'};
+	ptr_img->magic_number[0] = '0';
+	ptr_img->magic_number[1] = '0';
+	ptr_img->magic_Number=(unsigned short *) ptr_img->magic_number;
+	//unsigned short *magic_Number = (unsigned short *) ptr_img->magic_number;
 	ptr_img->inputFile =  fopen(fileName, "r");
 	ptr_img->fileName=fileName;
 
 	if (ptr_img->inputFile == NULL)
 		return EXIT_BAD_INPUT_FILE;
 
-	magic_number[0] = getc(ptr_img->inputFile);
-	magic_number[1] = getc(ptr_img->inputFile);
-
-	if(magicNumberCheck(ptr_img)){
-		return EXIT_BAD_INPUT_FILE;
-		}
+	ptr_img->magic_number[0] = getc(ptr_img->inputFile);
+	ptr_img->magic_number[1] = getc(ptr_img->inputFile);
+	// if(magicNumberCheck(ptr_img)){
+	// 	return EXIT_BAD_INPUT_FILE;
+	// }
 
 	int scanCount = fscanf(ptr_img->inputFile, " ");
 

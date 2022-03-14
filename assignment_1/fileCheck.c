@@ -8,19 +8,19 @@
 #define EXIT_BAD_INPUT_FILE 2
 #define EXIT_BAD_OUTPUT_FILE 3
 
-#define MAGIC_NUMBER_RAW_PGM 0x3550
+#define MAGIC_NUMBER_RAW_PGM 0x3535
 #define MAGIC_NUMBER_ASCII_PGM 0x3250
 #define MIN_IMAGE_DIMENSION 1
 #define MAX_IMAGE_DIMENSION 65536
 #define MAX_COMMENT_LINE_LENGTH 128
 
-int magicNumberCheck(image *ptr_image1){
-    if (*ptr_image1->magic_Number != MAGIC_NUMBER_ASCII_PGM)
+int magicNumberCheck(image *ptr_img){
+    if (*ptr_img->magic_Number != MAGIC_NUMBER_ASCII_PGM && *ptr_img->magic_Number != MAGIC_NUMBER_RAW_PGM)
 		{ /* failed magic number check   */
 		/* be tidy: close the file       */
-        fclose(ptr_image1->inputFile);
+        fclose(ptr_img->inputFile);
 		/* print an error message */
-		printf("Magic number %s\n", ptr_image1->fileName);
+		printf("Magic number %s\n", ptr_img->fileName);
 		/* and return                    */
 		return 1;
 		} /* failed magic number check   */

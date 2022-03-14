@@ -60,7 +60,9 @@ int main(int argc, char **argv)
 	long nImageBytes = ptr_img1->width * ptr_img1->height * sizeof(unsigned char);
 	image img2 = {.width=ptr_img1->width,.height=ptr_img1->height, .maxGray=ptr_img1->maxGray, .imageData=ptr_img1->imageData, .commentLine=ptr_img1->commentLine};
 	image *ptr_img2=&img2;
-	ptr_img2->magic_Number=ptr_img1->magic_Number;
+	ptr_img2->magic_number[0] = 'P';
+	ptr_img2->magic_number[1] = '2';
+	ptr_img2->magic_Number=(unsigned short *) ptr_img2->magic_number;
 	//ptr_img2=&img2;
 
 	returnVal=writeToFile(ptr_img2, argv[2],nImageBytes);
