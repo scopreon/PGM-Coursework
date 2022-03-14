@@ -36,7 +36,7 @@ int readData(image *ptr_img,long nImageBytes){
 		if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
 			//*nextGrayValue = (char) (((int) *nextGrayValue)/ptr_img->maxGray * 255);
 			int scanCount = fread(&grayValue,1,1,ptr_img->inputFile);
-			//grayValue=(((int) grayValue)/ptr_img->maxGray * 255);
+			grayValue=(((int) grayValue)/ptr_img->maxGray * 255);
 			printf("%u\n", grayValue);
 			
 		}
@@ -62,7 +62,7 @@ int readData(image *ptr_img,long nImageBytes){
 		}
     return 0;
 }
-int writeData(image *ptr_img,long nImageBytes){
+int writeData(image *ptr_img,long nImageBytes, int factor){
     if (ptr_img->outputFile == NULL)
 		{
 		free(ptr_img->commentLine);
@@ -75,7 +75,11 @@ int writeData(image *ptr_img,long nImageBytes){
 	// char magicNumber[3];
 	// memcpy(magicNumber, (char *) ptr_img->magic_Number , 2);
 	// printf("%s",magicNumber);
-	size_t nBytesWritten = fprintf(ptr_img->outputFile, "%s\n%d %d\n%d\n", ptr_img->magic_Number,ptr_img->width, ptr_img->height, ptr_img->maxGray);
+	int oldWidth=ptr_img->width;
+	ptr_img->width=(ptr_img->width+factor-1)/factor;
+	ptr_img->height=(ptr_img->height+factor-1)/factor;
+
+	size_t nBytesWritten = fprintf(ptr_img->outputFile, "%s\n%d %d\n%d\n", (char *) ptr_img->magic_Number,ptr_img->width, ptr_img->height, ptr_img->maxGray);
     if (nBytesWritten < 0)
 		{ /* dimensional write failed    */
 		/* free memory                   */
@@ -88,6 +92,8 @@ int writeData(image *ptr_img,long nImageBytes){
 		/* return an error code          */
 		return 1;
 	} /* dimensional write failed    */
+	int column=0;
+	int row=0;
     for (unsigned char *nextGrayValue = ptr_img->imageData; nextGrayValue < ptr_img->imageData + nImageBytes; nextGrayValue++)
             { /* per gray value */
 		/* get next char's column        */
@@ -95,16 +101,20 @@ int writeData(image *ptr_img,long nImageBytes){
 		//printf("%x ", *nextGrayValue);
 		/* write the entry & whitespace  */
 
-		
+		if(column%factor==0 && row%factor==0){
 		if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
 			//*nextGrayValue = (char) (((int) *nextGrayValue)/ptr_img->maxGray * 255);
-			//*nextGrayValue=(int) (((float) *nextGrayValue)/ptr_img->maxGray *255);
+			// *nextGrayValue=(int) *nextGrayValue/2;
 			nBytesWritten = fwrite(nextGrayValue, 1, 1, ptr_img->outputFile);
 		}
 		else{
 			nBytesWritten = fprintf(ptr_img->outputFile, "%d%c", *nextGrayValue, (nextCol ? ' ' : '\n') );
 		}
-		
+		}
+		column++;
+		if(column%(oldWidth) == 0){
+			row++;
+		}
 		/* sanity check on write         */
 		if (nBytesWritten < 0)
 			{ /* data write failed   */
@@ -162,10 +172,10 @@ int readInFile(image *ptr_img, char *fileName){
     return EXIT_NO_ERRORS;
 }
 
-int writeToFile(image *ptr_img, char *fileName, int nImageBytes){
+int writeToFile(image *ptr_img, char *fileName, int nImageBytes, int factor){
     ptr_img->fileName=fileName;
     ptr_img->outputFile = fopen(fileName, "w");
-    if(writeData(ptr_img,nImageBytes)){
+    if(writeData(ptr_img,nImageBytes,factor)){
 		return EXIT_BAD_OUTPUT_FILE;
 	}
     return EXIT_NO_ERRORS;

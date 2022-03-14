@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 	ptr_img2->magic_Number=(unsigned short *) ptr_img2->magic_number;
 	//ptr_img2=&img2;
 
-	returnVal=writeToFile(ptr_img2, argv[2],nImageBytes);
+	returnVal=writeToFile(ptr_img2, argv[2],nImageBytes,1);
 	//ptr_img2->fileName=argv[2];
     //ptr_img2->outputFile = fopen(argv[2], "w");
 	//returnVal=fwrite(ptr_img1->imageData,1,4,ptr_img2->outputFile);
