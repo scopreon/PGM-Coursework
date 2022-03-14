@@ -49,54 +49,28 @@ int main(int argc, char **argv)
 	/* ASCII:  0x5032 or P2		         */
 
 	image img1 = {.width=0,.height=0, .maxGray=255, .imageData=NULL, .commentLine=NULL};
-	image *ptr_img1;
-	ptr_img1=&img1;
+	image *ptr_img1=&img1;
+	//ptr_img1=&img1;
 	
-	unsigned char magic_number[2] = {'0','0'};
-	ptr_img1->magic_Number=(unsigned short *) magic_number;
-	unsigned short *magic_Number = (unsigned short *) magic_number;
-	ptr_img1->inputFile =  fopen(argv[1], "r");
-	ptr_img1->fileName=argv[1];
-
-	if (ptr_img1->inputFile == NULL)
-		return EXIT_BAD_INPUT_FILE;
-
-	magic_number[0] = getc(ptr_img1->inputFile);
-	magic_number[1] = getc(ptr_img1->inputFile);
-
-	if(magicNumberCheck(ptr_img1, MAGIC_NUMBER_ASCII_PGM)){
-		return EXIT_BAD_INPUT_FILE;
-		}
-
-	int scanCount = fscanf(ptr_img1->inputFile, " ");
-
-	if(getCommentLine(ptr_img1,MAX_COMMENT_LINE_LENGTH)){
-		return EXIT_BAD_INPUT_FILE;
-	}
-
-	scanCount = fscanf(ptr_img1->inputFile, " %u %u %u", &(ptr_img1->width), &(ptr_img1->height), &(ptr_img1->maxGray));
-
-	if(sizeCheck(ptr_img1,scanCount,MIN_IMAGE_DIMENSION,MAX_IMAGE_DIMENSION)){
-		return EXIT_BAD_INPUT_FILE;
+	int returnVal = readInFile(ptr_img1, argv[1]);
+	if(returnVal!=0){
+		return returnVal;
 	}
 
 	long nImageBytes = ptr_img1->width * ptr_img1->height * sizeof(unsigned char);
-	ptr_img1->imageData = (unsigned char *) malloc(nImageBytes);
-	if(readData(ptr_img1,nImageBytes)){
-		return EXIT_BAD_INPUT_FILE;
-	}
-
-	fclose(ptr_img1->inputFile);
 	image img2 = {.width=ptr_img1->width,.height=ptr_img1->height, .maxGray=ptr_img1->maxGray, .imageData=ptr_img1->imageData, .commentLine=ptr_img1->commentLine};
-	ptr_img1->fileName=argv[2];
-	image *ptr_img2;
-	ptr_img2=&img2;
-	ptr_img2->outputFile = fopen(argv[2], "w");
+	image *ptr_img2=&img2;
+	//ptr_img2=&img2;
 
-	if(writeData(ptr_img2,nImageBytes)){
-		return EXIT_BAD_OUTPUT_FILE;
+	returnVal=writeToFile(ptr_img2, argv[2],nImageBytes);
+	//ptr_img2->fileName=argv[2];
+    //ptr_img2->outputFile = fopen(argv[2], "w");
+	//returnVal=fwrite(ptr_img1->imageData,1,4,ptr_img2->outputFile);
+	if(returnVal!=0){
+		return returnVal;
 	}
 
 	/* at this point, we are done and can exit with a success code */
+	printf("ECHOED\n");
 	return EXIT_NO_ERRORS;
 	} /* main() */

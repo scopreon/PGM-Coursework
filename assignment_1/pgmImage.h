@@ -16,5 +16,7 @@ typedef struct Image{
 
 int writeData(image *ptr_img2,long nImageBytes);
 int readData(image *ptr_img1,long nImageBytes);
+int readInFile(image *ptr_img, char *fileName);
+int writeToFile(image *ptr_img, char *fileName, int nImageBytes);
 
 #endif

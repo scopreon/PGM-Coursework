@@ -2,7 +2,19 @@
 #include <stdlib.h>
 #include "fileCheck.h"
 #include "pgmImage.h"
-int magicNumberCheck(image *ptr_image1, int MAGIC_NUMBER_ASCII_PGM){
+
+#define EXIT_NO_ERRORS 0
+#define EXIT_WRONG_ARG_COUNT 1
+#define EXIT_BAD_INPUT_FILE 2
+#define EXIT_BAD_OUTPUT_FILE 3
+
+#define MAGIC_NUMBER_RAW_PGM 0x3550
+#define MAGIC_NUMBER_ASCII_PGM 0x3250
+#define MIN_IMAGE_DIMENSION 1
+#define MAX_IMAGE_DIMENSION 65536
+#define MAX_COMMENT_LINE_LENGTH 128
+
+int magicNumberCheck(image *ptr_image1){
     if (*ptr_image1->magic_Number != MAGIC_NUMBER_ASCII_PGM)
 		{ /* failed magic number check   */
 		/* be tidy: close the file       */
@@ -18,26 +30,26 @@ int magicNumberCheck(image *ptr_image1, int MAGIC_NUMBER_ASCII_PGM){
 	
 }
 
-int getCommentLine(image *ptr_img1, int MAX_COMMENT_LINE_LENGTH){
-    char nextChar = fgetc(ptr_img1->inputFile);
+int getCommentLine(image *ptr_img){
+    char nextChar = fgetc(ptr_img->inputFile);
     if (nextChar == '#')
         
 		{ /* comment line                */
 		/* allocate buffer               */
-		ptr_img1->commentLine = (char *) malloc(MAX_COMMENT_LINE_LENGTH);
+		ptr_img->commentLine = (char *) malloc(MAX_COMMENT_LINE_LENGTH);
 		/* fgets() reads a line          */
 		/* capture return value          */
-		char *commentString = fgets(ptr_img1->commentLine, MAX_COMMENT_LINE_LENGTH, ptr_img1->inputFile);
+		char *commentString = fgets(ptr_img->commentLine, MAX_COMMENT_LINE_LENGTH, ptr_img->inputFile);
 		/* NULL means failure            */
 		if (commentString == NULL)
 			{ /* NULL comment read   */
 			/* free memory           */
-			free(ptr_img1->commentLine);
+			free(ptr_img->commentLine);
 			/* close file            */
-			fclose(ptr_img1->inputFile);
+			fclose(ptr_img->inputFile);
 
 			/* print an error message */
-			printf("Comment %s\n",ptr_img1->fileName);	
+			printf("Comment %s\n",ptr_img->fileName);	
 		
 			/* and return            */
 			return 1;
@@ -47,31 +59,31 @@ int getCommentLine(image *ptr_img1, int MAX_COMMENT_LINE_LENGTH){
         }
 	} /* comment line */
     else{
-        ungetc(nextChar, ptr_img1->inputFile);
+        ungetc(nextChar, ptr_img->inputFile);
         return 0;
     }
 }
 
 
 
-int sizeCheck(image *ptr_img1,int scanCount,int MIN_IMAGE_DIMENSION, int MAX_IMAGE_DIMENSION){
+int sizeCheck(image *ptr_img,int scanCount){
     if 	(
 		(scanCount != 3				)	||
-		(ptr_img1->width 	< MIN_IMAGE_DIMENSION	) 	||
-		(ptr_img1->width 	> MAX_IMAGE_DIMENSION	) 	||
-		(ptr_img1->height < MIN_IMAGE_DIMENSION	) 	||
-		(ptr_img1->height > MAX_IMAGE_DIMENSION	) 	||
-		(ptr_img1->maxGray	> 255		)
+		(ptr_img->width 	< MIN_IMAGE_DIMENSION	) 	||
+		(ptr_img->width 	> MAX_IMAGE_DIMENSION	) 	||
+		(ptr_img->height < MIN_IMAGE_DIMENSION	) 	||
+		(ptr_img->height > MAX_IMAGE_DIMENSION	) 	||
+		(ptr_img->maxGray	> 255		)
 		)
 		{ /* failed size sanity check    */
 		/* free up the memory            */
-		free(ptr_img1->commentLine);
+		free(ptr_img->commentLine);
 
 		/* be tidy: close file pointer   */
-		fclose(ptr_img1->inputFile);
+		fclose(ptr_img->inputFile);
 
 		/* print an error message */
-		printf("3Error: Failed to read pgm image from file %s\n", ptr_img1->fileName);	
+		printf("3Error: Failed to read pgm image from file %s\n", ptr_img->fileName);	
 		
 		/* and return                    */
 		return 1;

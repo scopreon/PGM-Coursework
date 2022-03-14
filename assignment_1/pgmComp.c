@@ -21,8 +21,8 @@
 /* library for memory routines     */
 #include <stdlib.h>
 
-#include <image.h>
-
+#include "fileCheck.h"
+#include "pgmImage.h"
 #define EXIT_NO_ERRORS 0
 #define EXIT_WRONG_ARG_COUNT 1
 #define EXIT_BAD_INPUT_FILE 2
@@ -66,173 +66,38 @@ int main(int argc, char **argv)
 	/* Raw:    0x5035 or P5		         */
 	/* ASCII:  0x5032 or P2		         */
 
-
-	// unsigned char magic_number[2] = {'0','0'};
-	// unsigned short *magic_Number = (unsigned short *) magic_number;
-	
-	// /* we will store ONE comment	         */
-	// char *commentLine = NULL;
-
-	// /* the logical width & height	         */
-	// /* note: cannot be negative	         */
-	// unsigned int width = 0, height = 0;
-
-	// /* maximum gray value (assumed)	         */
-	// /* make it an integer for ease	         */
-	// unsigned int maxGray = 255;
-
-	// /* pointer to raw image data	         */
-	// unsigned char *imageData = NULL;
-	
-	// /* now start reading in the data         */
-	// /* try to open the file for text I/O     */
-	// /* in ASCII mode b/c the header is text  */
-
-    struct Images img1={.commentLine=NULL,.width=0,.height=0,.maxGray=255,.imageData=NULL};
-
-    img1.magic_number[0] = '0';
-    img1.magic_Number[1] = '0';
-
-    img1.magic_Number = (unsigned short *) img1.magic_number;
-
-	FILE *inputFile = fopen(argv[1], "r");
-
-	/* if it fails, return error code        */
-	if (inputFile == NULL)
-		return EXIT_BAD_INPUT_FILE;
-
-	/* read in the magic number              */
-	img1.magic_number[0] = getc(inputFile);
-	img1.magic_number[1] = getc(inputFile);
-
-    
-
-	/* sanity check on the magic number      */
-	if (img1.magic_Number != MAGIC_NUMBER_ASCII_PGM)
-		{ /* failed magic number check   */
-		/* be tidy: close the file       */
-		fclose(inputFile);
-
-		/* print an error message */
-		printf("Error: Failed to read pgm image from file %s\n", argv[1]);	
-		
-		/* and return                    */
-		return EXIT_BAD_INPUT_FILE;
-		} /* failed magic number check   */
-
-	/* scan whitespace if present            */
-	int scanCount = fscanf(inputFile, " ");
-
-	/* check for a comment line              */
-	char nextChar = fgetc(inputFile);
-	if (nextChar == '#')
-		{ /* comment line                */
-		/* allocate buffer               */
-		img1.commentLine = (char *) malloc(MAX_COMMENT_LINE_LENGTH);
-		/* fgets() reads a line          */
-		/* capture return value          */
-		char *commentString = fgets(img1.commentLine, MAX_COMMENT_LINE_LENGTH, inputFile);
-		/* NULL means failure            */
-		if (commentString == NULL)
-			{ /* NULL comment read   */
-			/* free memory           */
-			free(img1.commentLine);
-			/* close file            */
-			fclose(inputFile);
-
-			/* print an error message */
-			printf("Error: Failed to read pgm image from file %s\n", argv[1]);	
-		
-			/* and return            */
-			return EXIT_BAD_INPUT_FILE;
-			} /* NULL comment read   */
-		} /* comment line */
-	else
-		{ /* not a comment line */
-		/* put character back            */
-		ungetc(nextChar, inputFile);
-		} /* not a comment line */
-
-	/* read in width, height, grays          */
-	/* whitespace to skip blanks             */
-	scanCount = fscanf(inputFile, " %u %u %u", &(img1.width), &(img1.height), &(img1.maxGray));
-
-	/* sanity checks on size & grays         */
-	/* must read exactly three values        */
-	if 	(
-		(scanCount != 3				)	||
-		(img1.width 	< MIN_IMAGE_DIMENSION	) 	||
-		(img1.width 	> MAX_IMAGE_DIMENSION	) 	||
-		(img1.height < MIN_IMAGE_DIMENSION	) 	||
-		(img1.height > MAX_IMAGE_DIMENSION	) 	||
-		(img1.maxGray	!= 255		)
-		)
-		{ /* failed size sanity check    */
-		/* free up the memory            */
-		free(img1.commentLine);
-
-		/* be tidy: close file pointer   */
-		fclose(inputFile);
-
-		/* print an error message */
-		printf("Error: Failed to read pgm image from file %s\n", argv[1]);	
-		
-		/* and return                    */
-		return EXIT_BAD_INPUT_FILE;
-		} /* failed size sanity check    */
-
-	/* allocate the data pointer             */
-	long nImageBytes = img1.width * img1.height * sizeof(unsigned char);
-	img1.imageData = (unsigned char *) malloc(nImageBytes);
-
-	/* sanity check for memory allocation    */
-	if (img1.imageData == NULL)
-		{ /* malloc failed */
-		/* free up memory                */
-		free(img1.commentLine);
-
-		/* close file pointer            */
-		fclose(inputFile);
-
-		/* print an error message */
-		printf("Error: Failed to read pgm image from file %s\n", argv[1]);	
-		
-		/* return error code             */
-		return EXIT_BAD_INPUT_FILE;
-		} /* malloc failed */
-
-	/* pointer for efficient read code       */
-	for (unsigned char *nextGrayValue = img1.imageData; nextGrayValue < img1.imageData + nImageBytes; nextGrayValue++)
-		{ /* per gray value */
-		/* read next value               */
-		int grayValue = -1;
-		int scanCount = fscanf(inputFile, " %u", &grayValue);
-
-		/* sanity check	                 */
-		if ((scanCount != 1) || (grayValue < 0) || (grayValue > 255))
-			{ /* fscanf failed */
-			/* free memory           */
-			free(img1.commentLine);
-			free(img1.imageData);	
-
-			/* close file            */
-			fclose(inputFile);
-
-			/* print error message   */
-			printf("Error: Failed to read pgm image from file %s\n", argv[1]);	
-		
-			/* and return            */
-			return EXIT_BAD_INPUT_FILE;
-			} /* fscanf failed */
-
-		/* set the pixel value           */
-		*nextGrayValue = (unsigned char) grayValue;
-		} /* per gray value */
-
-	/* we're done with the file, so close it */
-	fclose(inputFile);
-
-
 	/* at this point, we are done and can exit with a success code */
+	image img1 = {.width=0,.height=0, .maxGray=255, .imageData=NULL, .commentLine=NULL};
+	image *ptr_img1=&img1;
+
+	image img2 = {.width=0,.height=0, .maxGray=255, .imageData=NULL, .commentLine=NULL};
+	image *ptr_img2=&img2;
+
+	int returnVal = readInFile(ptr_img1, argv[1]);
+	if(returnVal!=0){
+		return returnVal;
+	}
+	returnVal = readInFile(ptr_img2, argv[2]);
+	if(returnVal!=0){
+		return returnVal;
+	}
+	if(ptr_img1->width != ptr_img2->width || ptr_img1->height != ptr_img2->height){
+		printf("DIFFERENT\n");
+		return EXIT_NO_ERRORS;
+	}
+	long nImageBytes = ptr_img1->width * ptr_img1->height * sizeof(unsigned char);
+
+	unsigned char *nextGrayValue1 = ptr_img1->imageData;
+	unsigned char *nextGrayValue2 = ptr_img2->imageData;
+	while (nextGrayValue1 < ptr_img1->imageData + nImageBytes){
+		int nextCol = (nextGrayValue1 - ptr_img1->imageData + 1) % ptr_img1->width;
+		if(((float) *nextGrayValue2)/ptr_img2->maxGray!=((float) *nextGrayValue1)/ptr_img1->maxGray){
+			printf("DIFFERENT\n");
+			return EXIT_NO_ERRORS;
+		}
+		nextGrayValue1++;
+		nextGrayValue2++;
+	}
+	printf("IDENTICAL\n");
 	return EXIT_NO_ERRORS;
 	} /* main() */
