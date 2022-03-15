@@ -36,8 +36,7 @@ int readData(image *ptr_img,long nImageBytes){
 		if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
 			//*nextGrayValue = (char) (((int) *nextGrayValue)/ptr_img->maxGray * 255);
 			int scanCount = fread(&grayValue,1,1,ptr_img->inputFile);
-			grayValue=(((int) grayValue)/ptr_img->maxGray * 255);
-			printf("%u\n", grayValue);
+			//grayValue=(((int) grayValue)/ptr_img->maxGray * 255);
 			
 		}
 		else{

@@ -1,4 +1,4 @@
-# all : pgmEcho.c
+all : pgmEcho pgmComp pgma2b pgmb2a pgmReduce
 # pgmComp.c pgma2b.c pgmb2a.c pgmReduce.c
 pgmEcho: fileCheck.c pgmImage.c
 	gcc -std=c99 -ggdb -o pgmEcho pgmEcho.c fileCheck.c pgmImage.c -I.
