@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "pgmImage.h"
 #include "fileCheck.h"
 
@@ -30,32 +31,34 @@ int readData(image *ptr_img,long nImageBytes){
 	if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
 		getc(ptr_img->inputFile);
 	}
+	int scanCount;
 	for (unsigned char *nextGrayValue = ptr_img->imageData; nextGrayValue < ptr_img->imageData + nImageBytes; nextGrayValue++)
 		{
 		int grayValue = -1;
 		if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
 			//*nextGrayValue = (char) (((int) *nextGrayValue)/ptr_img->maxGray * 255);
-			int scanCount = fread(&grayValue,1,1,ptr_img->inputFile);
-			//grayValue=(((int) grayValue)/ptr_img->maxGray * 255);
-			
+			scanCount = fread(&grayValue,1,1,ptr_img->inputFile);
+			//printf("%d", 256+(int)grayValue);
+			grayValue = 256+(int)grayValue;
 		}
 		else{
-			int scanCount = fscanf(ptr_img->inputFile, " %u", &grayValue);
+			scanCount = fscanf(ptr_img->inputFile, " %u", &grayValue);
+			grayValue=(int) (((float) grayValue)/ptr_img->maxGray * 255);
 		}
 		
 		
 		
-		// if ((scanCount != 1) || (grayValue < 0) || (grayValue > ptr_img->maxGray))
-		// 	{
-		// 	free(ptr_img->commentLine);
-		// 	free(ptr_img->imageData);	
+		if ((scanCount != 1) || (grayValue < 0) || (grayValue > ptr_img->maxGray))
+			{
+			free(ptr_img->commentLine);
+			free(ptr_img->imageData);	
 
-		// 	fclose(ptr_img->inputFile);
+			fclose(ptr_img->inputFile);
 
-		// 	printf("Error: Failed to read pgm image from file %s\n", ptr_img->fileName);	
+			printf("Error: Failed to read pgm image from file %s\n", ptr_img->fileName);	
 		
-		// 	return 1;
-		// 	}
+			return 1;
+			}
 
 		*nextGrayValue = (unsigned char) grayValue;
 		}
@@ -99,7 +102,6 @@ int writeData(image *ptr_img,long nImageBytes, int factor){
 		int nextCol = (nextGrayValue - ptr_img->imageData + 1) % ptr_img->width;
 		//printf("%x ", *nextGrayValue);
 		/* write the entry & whitespace  */
-
 		if(column%factor==0 && row%factor==0){
 		if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
 			//*nextGrayValue = (char) (((int) *nextGrayValue)/ptr_img->maxGray * 255);
@@ -107,6 +109,9 @@ int writeData(image *ptr_img,long nImageBytes, int factor){
 			nBytesWritten = fwrite(nextGrayValue, 1, 1, ptr_img->outputFile);
 		}
 		else{
+			// printf("%f ", (*nextGrayValue));
+			*nextGrayValue=(int) ceil((((float) *nextGrayValue)/255 * ptr_img->maxGray));
+			// printf("%d\n", (*nextGrayValue));
 			nBytesWritten = fprintf(ptr_img->outputFile, "%d%c", *nextGrayValue, (nextCol ? ' ' : '\n') );
 		}
 		}
