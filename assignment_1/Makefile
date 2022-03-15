@@ -1,6 +1,6 @@
 CC=gcc
 CCFLAGS=-ggdb -std=c99 -Wall -Werror
-MODULES=fileCheck.c pgmImage.c
+MODULES=fileCheck.o pgmImage.o
 MAINS=fileEcho.o pgmComp.o pgma2b.o pgmb2a.o pgmReduce.o
 TARGETS=pgmEcho pgmComp pgma2b pgmb2a pgmReduce
 
