@@ -5,83 +5,86 @@
 #include "pgmImage.h"
 #include "fileCheck.h"
 
-#define EXIT_NO_ERRORS 0
-#define EXIT_WRONG_ARG_COUNT 1
-#define EXIT_BAD_INPUT_FILE 2
-#define EXIT_BAD_OUTPUT_FILE 3
-
-#define MAGIC_NUMBER_RAW_PGM 0x3550
-#define MAGIC_NUMBER_ASCII_PGM 0x3250
-#define MIN_IMAGE_DIMENSION 1
-#define MAX_IMAGE_DIMENSION 65536
-#define MAX_COMMENT_LINE_LENGTH 128
-
+/*initialising image*/
+int initialiseImage(image *ptr_img,char *fileName){
+	if(ptr_img==NULL){
+		return 1;
+	}
+	ptr_img->height=0;
+    ptr_img->width=0;
+    ptr_img->maxGray=255;
+    ptr_img->commentLine=NULL;
+    ptr_img->fileStream=NULL;
+    ptr_img->fileName=fileName;
+    ptr_img->imageData=NULL;
+    ptr_img->magic_Number=NULL;
+	ptr_img->magic_number[0] = '0';
+	ptr_img->magic_number[1] = '0';
+	return 0;
+}
+/*function to read data*/
 int readData(image *ptr_img,long nImageBytes){
 
 	if (ptr_img->imageData == NULL)
 		{
-		free(ptr_img->commentLine);
-
-		fclose(ptr_img->inputFile);
-
-		printf("1Error: Failed to read pgm image from file %s\n", ptr_img->fileName);	
-		
-		return 1;
+		return EXIT_BAD_MALLOC;
 	}
+	/*checks ig magic number is binary*/
 	if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
-		getc(ptr_img->inputFile);
+		getc(ptr_img->fileStream);
 	}
 	int scanCount;
+	/*looping through gray values*/
 	for (unsigned char *nextGrayValue = ptr_img->imageData; nextGrayValue < ptr_img->imageData + nImageBytes; nextGrayValue++)
 		{
 		int grayValue = -1;
 		if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
-			//*nextGrayValue = (char) (((int) *nextGrayValue)/ptr_img->maxGray * 255);
-			scanCount = fread(&grayValue,1,1,ptr_img->inputFile);
-			//printf("%d", 256+(int)grayValue);
+			/*write single byte if in binary format*/
+			scanCount = fread(&grayValue,1,1,ptr_img->fileStream);
 			grayValue = 256+(int)grayValue;
 		}
 		else{
-			scanCount = fscanf(ptr_img->inputFile, " %u", &grayValue);
+			/*write using fscanf, ascii numbers*/
+			scanCount = fscanf(ptr_img->fileStream, " %u", &grayValue);
 			grayValue=(int) (((float) grayValue)/ptr_img->maxGray * 255);
 		}
 		
-		
-		
 		if ((scanCount != 1) || (grayValue < 0) || (grayValue > ptr_img->maxGray))
 			{
-			free(ptr_img->commentLine);
-			free(ptr_img->imageData);	
-
-			fclose(ptr_img->inputFile);
-
-			printf("Error: Failed to read pgm image from file %s\n", ptr_img->fileName);	
-		
-			return 1;
+			return EXIT_BAD_INPUT;
 			}
 
 		*nextGrayValue = (unsigned char) grayValue;
 		}
+		/*checking if there are too many values*/
+		int grayValue=-1;
+		if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
+			scanCount = fread(&grayValue,1,1,ptr_img->fileStream);
+			if(scanCount==0){
+				scanCount=-1;
+			}
+			
+		}
+		else{
+			scanCount = fscanf(ptr_img->fileStream, " %u", &grayValue);
+		}
+		if(scanCount!=-1){	
+			return EXIT_BAD_INPUT;
+		}
     return 0;
 }
-int writeData(image *ptr_img,long nImageBytes, int factor){
-    if (ptr_img->outputFile == NULL)
+int writeData(image *ptr_img,long nImageBytes){
+    if (ptr_img->fileStream == NULL)
 		{
 		free(ptr_img->commentLine);
 		free(ptr_img->imageData);
 
-		printf("2Error: Failed to write pgm image to file %s\n", ptr_img->fileName);	
+		printf("ERROR: Output Failed %s\n", ptr_img->fileName);	
 
 		return 1;
 		}
-	// char magicNumber[3];
-	// memcpy(magicNumber, (char *) ptr_img->magic_Number , 2);
-	// printf("%s",magicNumber);
-	int oldWidth=ptr_img->width;
-	ptr_img->width=(ptr_img->width+factor-1)/factor;
-	ptr_img->height=(ptr_img->height+factor-1)/factor;
 
-	size_t nBytesWritten = fprintf(ptr_img->outputFile, "%s\n%d %d\n%d\n", (char *) ptr_img->magic_Number,ptr_img->width, ptr_img->height, ptr_img->maxGray);
+	size_t nBytesWritten = fprintf(ptr_img->fileStream, "%s\n%d %d\n%d\n", (char *) ptr_img->magic_Number,ptr_img->width, ptr_img->height, ptr_img->maxGray);
     if (nBytesWritten < 0)
 		{ /* dimensional write failed    */
 		/* free memory                   */
@@ -89,36 +92,25 @@ int writeData(image *ptr_img,long nImageBytes, int factor){
 		free(ptr_img->imageData);
 
 		/* print an error message        */
-		printf("4Error: Failed to write pgm image to file %s\n", ptr_img->fileName);	
+		printf("ERROR: Output Failed %s\n", ptr_img->fileName);	
 
 		/* return an error code          */
 		return 1;
 	} /* dimensional write failed    */
-	int column=0;
-	int row=0;
     for (unsigned char *nextGrayValue = ptr_img->imageData; nextGrayValue < ptr_img->imageData + nImageBytes; nextGrayValue++)
             { /* per gray value */
 		/* get next char's column        */
 		int nextCol = (nextGrayValue - ptr_img->imageData + 1) % ptr_img->width;
-		//printf("%x ", *nextGrayValue);
 		/* write the entry & whitespace  */
-		if(column%factor==0 && row%factor==0){
 		if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
-			//*nextGrayValue = (char) (((int) *nextGrayValue)/ptr_img->maxGray * 255);
-			// *nextGrayValue=(int) *nextGrayValue/2;
-			nBytesWritten = fwrite(nextGrayValue, 1, 1, ptr_img->outputFile);
+			nBytesWritten = fwrite(nextGrayValue, 1, 1, ptr_img->fileStream);
 		}
 		else{
-			// printf("%f ", (*nextGrayValue));
 			*nextGrayValue=(int) ceil((((float) *nextGrayValue)/255 * ptr_img->maxGray));
-			// printf("%d\n", (*nextGrayValue));
-			nBytesWritten = fprintf(ptr_img->outputFile, "%d%c", *nextGrayValue, (nextCol ? ' ' : '\n') );
+			nBytesWritten = fprintf(ptr_img->fileStream, "%d%c", *nextGrayValue, (nextCol ? ' ' : '\n') );
+		
 		}
-		}
-		column++;
-		if(column%(oldWidth) == 0){
-			row++;
-		}
+
 		/* sanity check on write         */
 		if (nBytesWritten < 0)
 			{ /* data write failed   */
@@ -127,7 +119,7 @@ int writeData(image *ptr_img,long nImageBytes, int factor){
 			free(ptr_img->imageData);
 
 			/* print error message   */
-			printf("5Error: Failed to write pgm image to file %s\n", ptr_img->fileName);	
+			printf("ERROR: Output Failed %s\n", ptr_img->fileName);	
 
 			/* return an error code  */
 			return 1;
@@ -136,51 +128,54 @@ int writeData(image *ptr_img,long nImageBytes, int factor){
     return 0;
 }
 
-int readInFile(image *ptr_img, char *fileName){
-	// unsigned char magic_number[2] = {'0','0'};
+int readInFile(image *ptr_img, int intendedFormat){
+	/*initialising magic number*/
 	ptr_img->magic_number[0] = '0';
 	ptr_img->magic_number[1] = '0';
 	ptr_img->magic_Number=(unsigned short *) ptr_img->magic_number;
-	//unsigned short *magic_Number = (unsigned short *) ptr_img->magic_number;
-	ptr_img->inputFile =  fopen(fileName, "r");
-	ptr_img->fileName=fileName;
+	ptr_img->fileStream =  fopen(ptr_img->fileName, "r");
+	
 
-	if (ptr_img->inputFile == NULL)
-		return EXIT_BAD_INPUT_FILE;
-
-	ptr_img->magic_number[0] = getc(ptr_img->inputFile);
-	ptr_img->magic_number[1] = getc(ptr_img->inputFile);
-	// if(magicNumberCheck(ptr_img)){
-	// 	return EXIT_BAD_INPUT_FILE;
-	// }
-
-	int scanCount = fscanf(ptr_img->inputFile, " ");
-
-	if(getCommentLine(ptr_img)){
-		return EXIT_BAD_INPUT_FILE;
+	if (ptr_img->fileStream == NULL){
+		printf("ERROR: Bad File Name %s\n",ptr_img->fileName);
+		return EXIT_BAD_FILE_NAME;
 	}
 
-	scanCount = fscanf(ptr_img->inputFile, " %u %u %u", &(ptr_img->width), &(ptr_img->height), &(ptr_img->maxGray));
-
-	if(sizeCheck(ptr_img,scanCount)){
-		return EXIT_BAD_INPUT_FILE;
-	}
+	ptr_img->magic_number[0] = getc(ptr_img->fileStream);
+	ptr_img->magic_number[1] = getc(ptr_img->fileStream);
+	/*magic number check*/
+	if(magicNumberCheck(ptr_img,intendedFormat)){return EXIT_BAD_MAGIC_NUMBER;}
+	int scanCount = fscanf(ptr_img->fileStream, " ");
+	/*comment line check*/
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	scanCount = fscanf(ptr_img->fileStream, " %u %u %u", &(ptr_img->width), &(ptr_img->height), &(ptr_img->maxGray));
+	/*check gray value*/
+	if(grayCheck(ptr_img)){return EXIT_BAD_MAX_GRAY;}
+	/*size check*/
+	if(sizeCheck(ptr_img,scanCount)){return EXIT_BAD_DIMENSIONS;}
 
 	long nImageBytes = ptr_img->width * ptr_img->height * sizeof(unsigned char);
 	ptr_img->imageData = (unsigned char *) malloc(nImageBytes);
-	if(readData(ptr_img,nImageBytes)){
-		return EXIT_BAD_INPUT_FILE;
+	int r=0;
+	/*reading in data, nImageBytes number of bytes*/
+	if((r=readData(ptr_img,nImageBytes))!=0){
+		free(ptr_img->commentLine);
+		free(ptr_img->imageData);	
+
+		fclose(ptr_img->fileStream);
+
+		printf("ERROR: Bad Data %s\n", ptr_img->fileName);	
+		return r;
 	}
 
-	fclose(ptr_img->inputFile);
+	fclose(ptr_img->fileStream);
     return EXIT_NO_ERRORS;
 }
-
-int writeToFile(image *ptr_img, char *fileName, int nImageBytes, int factor){
-    ptr_img->fileName=fileName;
-    ptr_img->outputFile = fopen(fileName, "w");
-    if(writeData(ptr_img,nImageBytes,factor)){
-		return EXIT_BAD_OUTPUT_FILE;
+/*writing to file, parses a fileName and number of bytes to write*/
+int writeToFile(image *ptr_img, char *fileName, int nImageBytes){
+    ptr_img->fileStream = fopen(ptr_img->fileName, "w");
+    if(writeData(ptr_img,nImageBytes)){
+		return EXIT_BAD_OUTPUT;
 	}
     return EXIT_NO_ERRORS;
 }

@@ -16,9 +16,3 @@ III.
 IV.
  - Letter for col/row in file name
  - Wrong filename/doesn't exist
-
-V.
- - Too busy will fill in later
-
-VI.
- - Too busy will fill in later

@@ -6,8 +6,7 @@ typedef struct Image{
     int width;
     int maxGray;
     char *commentLine;
-    FILE *inputFile;
-    FILE *outputFile;
+    FILE *fileStream;
     char *fileName;
     unsigned char *imageData;
     unsigned short *magic_Number;
@@ -17,7 +16,8 @@ typedef struct Image{
 
 // int writeData(image *ptr_img2,long nImageBytes);
 // int readData(image *ptr_img1,long nImageBytes);
-int readInFile(image *ptr_img, char *fileName);
-int writeToFile(image *ptr_img, char *fileName, int nImageBytes, int factor);
+int readInFile(image *ptr_img, int intendedFormat);
+int writeToFile(image *ptr_img, char *fileName, int nImageBytes);
+int initialiseImage(image *ptr_img,char *fileName);
 
 #endif
