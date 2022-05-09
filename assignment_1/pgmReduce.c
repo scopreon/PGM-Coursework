@@ -1,10 +1,11 @@
 /* library for I/O routines        */
 #include <stdio.h>
-
+#include <ctype.h>
 /* library for memory routines     */
 #include <stdlib.h>
 #include "fileCheck.h"
 #include "pgmImage.h"
+
 
 /***********************************/
 /* main routine                    */
@@ -34,6 +35,16 @@ int main(int argc, char **argv)
 		return EXIT_WRONG_ARG_COUNT;
 	} /* wrong arg count */
 	/*getting factor size from ascii to int*/
+	for(int i = 0; argv[2][i]!='\0';i++){
+		if(!isdigit(argv[2][i])){
+			printf("ERROR: Miscellaneous (invalid scaling factor)\n");
+			return 100;
+		}
+	}
+	// if(!isdigit(argv[2])){
+	// 	printf("ERROR: Miscellaneous (non-numeric scaling factor)\n");
+	// 	return 100;
+	// }
     int size = atoi(argv[2]);
 	image *ptr_img1 = malloc(sizeof(image));
 	/*initialising image 1*/

@@ -27,6 +27,7 @@ int readData(image *ptr_img,long nImageBytes){
 
 	if (ptr_img->imageData == NULL)
 		{
+		printf("ERROR: Image Malloc Failed\n");
 		return EXIT_BAD_MALLOC;
 	}
 	/*checks ig magic number is binary*/
@@ -79,7 +80,7 @@ int writeData(image *ptr_img,long nImageBytes){
 		free(ptr_img->commentLine);
 		free(ptr_img->imageData);
 
-		printf("ERROR: Output Failed %s\n", ptr_img->fileName);	
+		printf("ERROR: Output Failed (%s)\n", ptr_img->fileName);	
 
 		return 1;
 		}
@@ -92,7 +93,7 @@ int writeData(image *ptr_img,long nImageBytes){
 		free(ptr_img->imageData);
 
 		/* print an error message        */
-		printf("ERROR: Output Failed %s\n", ptr_img->fileName);	
+		printf("ERROR: Output Failed (%s)\n", ptr_img->fileName);	
 
 		/* return an error code          */
 		return 1;
@@ -106,7 +107,7 @@ int writeData(image *ptr_img,long nImageBytes){
 			nBytesWritten = fwrite(nextGrayValue, 1, 1, ptr_img->fileStream);
 		}
 		else{
-			*nextGrayValue=(int) ceil((((float) *nextGrayValue)/255 * ptr_img->maxGray));
+			*nextGrayValue=(int) ((((float) *nextGrayValue)/255 * ptr_img->maxGray));
 			nBytesWritten = fprintf(ptr_img->fileStream, "%d%c", *nextGrayValue, (nextCol ? ' ' : '\n') );
 		
 		}
@@ -119,7 +120,7 @@ int writeData(image *ptr_img,long nImageBytes){
 			free(ptr_img->imageData);
 
 			/* print error message   */
-			printf("ERROR: Output Failed %s\n", ptr_img->fileName);	
+			printf("ERROR: Output Failed (%s)\n", ptr_img->fileName);	
 
 			/* return an error code  */
 			return 1;
@@ -135,24 +136,48 @@ int readInFile(image *ptr_img, int intendedFormat){
 	ptr_img->magic_Number=(unsigned short *) ptr_img->magic_number;
 	ptr_img->fileStream =  fopen(ptr_img->fileName, "r");
 	
-
+	
 	if (ptr_img->fileStream == NULL){
-		printf("ERROR: Bad File Name %s\n",ptr_img->fileName);
+		printf("ERROR: Bad File Name (%s)\n",ptr_img->fileName);
 		return EXIT_BAD_FILE_NAME;
 	}
-
+	
 	ptr_img->magic_number[0] = getc(ptr_img->fileStream);
 	ptr_img->magic_number[1] = getc(ptr_img->fileStream);
 	/*magic number check*/
-	if(magicNumberCheck(ptr_img,intendedFormat)){return EXIT_BAD_MAGIC_NUMBER;}
+	//return EXIT_BAD_DIMENSIONS;
+	
+	if(magicNumberCheck(ptr_img,0)){return EXIT_BAD_MAGIC_NUMBER;}
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	
 	int scanCount = fscanf(ptr_img->fileStream, " ");
 	/*comment line check*/
+	
 	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
-	scanCount = fscanf(ptr_img->fileStream, " %u %u %u", &(ptr_img->width), &(ptr_img->height), &(ptr_img->maxGray));
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	
+	scanCount = fscanf(ptr_img->fileStream, " %u %u", &(ptr_img->width), &(ptr_img->height));
+	
 	/*check gray value*/
-	if(grayCheck(ptr_img)){return EXIT_BAD_MAX_GRAY;}
-	/*size check*/
+	//printf("%i %i", ptr_img->width, ptr_img->height);
 	if(sizeCheck(ptr_img,scanCount)){return EXIT_BAD_DIMENSIONS;}
+	//return EXIT_BAD_DIMENSIONS;
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	scanCount = fscanf(ptr_img->fileStream, " %u", &(ptr_img->maxGray));
+	if(grayCheck(ptr_img)){return EXIT_BAD_MAX_GRAY;}
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	/*size check*/
+	
 
 	long nImageBytes = ptr_img->width * ptr_img->height * sizeof(unsigned char);
 	ptr_img->imageData = (unsigned char *) malloc(nImageBytes);
@@ -164,10 +189,10 @@ int readInFile(image *ptr_img, int intendedFormat){
 
 		fclose(ptr_img->fileStream);
 
-		printf("ERROR: Bad Data %s\n", ptr_img->fileName);	
+		printf("ERROR: Bad Data (%s)\n", ptr_img->fileName);	
 		return r;
 	}
-
+	if(magicNumberCheck(ptr_img,intendedFormat)){return EXIT_BAD_MAGIC_NUMBER;}
 	fclose(ptr_img->fileStream);
     return EXIT_NO_ERRORS;
 }

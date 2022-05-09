@@ -1,5 +1,5 @@
 CC=gcc
-CCFLAGS=-g -lm -std=c99 -Wall -Werror
+CCFLAGS=-g -std=c99 -Wall -Werror
 CFLAGS=-std=c99
 MODULES=fileCheck.o pgmImage.o
 MAINS=pgmEcho.o pgmComp.o pgma2b.o pgmb2a.o pgmReduce.o

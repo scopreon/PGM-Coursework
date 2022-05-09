@@ -5,14 +5,14 @@
 
 //error for wrong intended format
 int magicNumberCheck(image *ptr_img,int magicNumberVerify){
-    if ((*ptr_img->magic_Number != MAGIC_NUMBER_ASCII_PGM && *ptr_img->magic_Number != MAGIC_NUMBER_RAW_PGM && magicNumberVerify==0)||
-	(*ptr_img->magic_Number != MAGIC_NUMBER_ASCII_PGM && magicNumberVerify==1)||
-	(*ptr_img->magic_Number != MAGIC_NUMBER_RAW_PGM && magicNumberVerify==2))
+    if ((*ptr_img->magic_Number != MAGIC_NUMBER_ASCII_PGM && *ptr_img->magic_Number != MAGIC_NUMBER_RAW_PGM)||
+	 (*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM && magicNumberVerify==1)||
+	 ( *ptr_img->magic_Number ==  MAGIC_NUMBER_ASCII_PGM && magicNumberVerify==2))
 		{ /* failed magic number check   */
 		/* be tidy: close the file       */
         fclose(ptr_img->fileStream);
 		/* print an error message */
-		printf("ERROR: Bad Magic Number %s\n", ptr_img->fileName);
+		printf("ERROR: Bad Magic Number (%s)\n", ptr_img->fileName);
 		/* and return                    */
 		return 1;
 		} /* failed magic number check   */
@@ -39,13 +39,13 @@ int getCommentLine(image *ptr_img){
             	break;
 			pointerToData++;
         	++count;
-			if(count>127 || *pointerToData=='\0'){
+			if(count>127){
 				free(ptr_img->commentLine);
 			/* close file            */
 				fclose(ptr_img->fileStream);
 
 			/* print an error message */
-				printf("ERROR: Bad Comment Line %s\n",ptr_img->fileName);	
+				printf("ERROR: Bad Comment Line (%s)\n",ptr_img->fileName);	
 		
 			/* and return            */
 				return 1;
@@ -63,11 +63,11 @@ int getCommentLine(image *ptr_img){
 
 int sizeCheck(image *ptr_img,int scanCount){
     if 	(
-		(scanCount != 3				)	||
+		(scanCount != 2				)	||
 		(ptr_img->width 	< MIN_IMAGE_DIMENSION	) 	||
-		(ptr_img->width 	> MAX_IMAGE_DIMENSION	) 	||
+		(ptr_img->width 	>= MAX_IMAGE_DIMENSION	) 	||
 		(ptr_img->height < MIN_IMAGE_DIMENSION	) 	||
-		(ptr_img->height > MAX_IMAGE_DIMENSION	) 
+		(ptr_img->height >= MAX_IMAGE_DIMENSION	) 
 		)
 		{ /* failed size sanity check    */
 		/* free up the memory            */
@@ -77,7 +77,7 @@ int sizeCheck(image *ptr_img,int scanCount){
 		fclose(ptr_img->fileStream);
 
 		/* print an error message */
-		printf("ERROR: Bad Dimensions %s\n", ptr_img->fileName);	
+		printf("ERROR: Bad Dimensions (%s)\n", ptr_img->fileName);	
 		
 		/* and return                    */
 		return 1;
@@ -101,7 +101,7 @@ int grayCheck(image *ptr_img){
 		fclose(ptr_img->fileStream);
 
 		/* print an error message */
-		printf("ERROR: Bad Max Gray Value %s\n", ptr_img->fileName);	
+		printf("ERROR: Bad Max Gray Value (%s)\n", ptr_img->fileName);	
 		
 		/* and return                    */
 		return 1;
