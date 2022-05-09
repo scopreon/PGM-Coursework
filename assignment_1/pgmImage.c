@@ -75,6 +75,7 @@ int readData(image *ptr_img,long nImageBytes){
     return 0;
 }
 int writeData(image *ptr_img,long nImageBytes){
+	
     if (ptr_img->fileStream == NULL)
 		{
 		free(ptr_img->commentLine);
@@ -84,7 +85,6 @@ int writeData(image *ptr_img,long nImageBytes){
 
 		return 1;
 		}
-
 	size_t nBytesWritten = fprintf(ptr_img->fileStream, "%s\n%d %d\n%d\n", (char *) ptr_img->magic_Number,ptr_img->width, ptr_img->height, ptr_img->maxGray);
     if (nBytesWritten < 0)
 		{ /* dimensional write failed    */
