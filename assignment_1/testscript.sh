@@ -161,7 +161,7 @@ else
 fi
 #-----------------Testing formating, gray, width, height etc...-----------------#
 echo -n "Testing comment line too big: "
-WHATWEWANT="ERROR: Bad Comment Line pepper_CommentBig.pgm"
+WHATWEWANT="ERROR: Bad Comment Line (pepper_CommentBig.pgm)"
 WHATWEGET=$(./pgmEcho pepper_CommentBig.pgm temp.pgm)
 ./pgmEcho pepper_CommentBig.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
@@ -175,7 +175,7 @@ else
 fi
 
 echo -n "Testing width value too big: "
-WHATWEWANT="ERROR: Bad Dimensions pepper_WidthBig.pgm"
+WHATWEWANT="ERROR: Bad Dimensions (pepper_WidthBig.pgm)"
 WHATWEGET=$(./pgmEcho pepper_WidthBig.pgm temp.pgm)
 ./pgmEcho pepper_WidthBig.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
@@ -189,7 +189,7 @@ else
 fi
 
 echo -n "Testing width value less than 1: "
-WHATWEWANT="ERROR: Bad Dimensions pepper_WidthSmall.pgm"
+WHATWEWANT="ERROR: Bad Dimensions (pepper_WidthSmall.pgm)"
 WHATWEGET=$(./pgmEcho pepper_WidthSmall.pgm temp.pgm)
 ./pgmEcho pepper_WidthSmall.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
@@ -203,7 +203,7 @@ else
 fi
 
 echo -n "Testing height value too big: "
-WHATWEWANT="ERROR: Bad Dimensions pepper_HeightBig.pgm"
+WHATWEWANT="ERROR: Bad Dimensions (pepper_HeightBig.pgm)"
 WHATWEGET=$(./pgmEcho pepper_HeightBig.pgm temp.pgm)
 ./pgmEcho pepper_HeightBig.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
@@ -217,7 +217,7 @@ else
 fi
 
 echo -n "Testing height value less than 1: "
-WHATWEWANT="ERROR: Bad Dimensions pepper_HeightSmall.pgm"
+WHATWEWANT="ERROR: Bad Dimensions (pepper_HeightSmall.pgm)"
 WHATWEGET=$(./pgmEcho pepper_HeightSmall.pgm temp.pgm)
 ./pgmEcho pepper_HeightSmall.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
@@ -231,7 +231,7 @@ else
 fi
 
 echo -n "Testing max gray value greater than 255: "
-WHATWEWANT="ERROR: Bad Max Gray Value pepper_MaxgrayBig.pgm"
+WHATWEWANT="ERROR: Bad Max Gray Value (pepper_MaxgrayBig.pgm)"
 WHATWEGET=$(./pgmEcho pepper_MaxgrayBig.pgm temp.pgm)
 ./pgmEcho pepper_MaxgrayBig.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
@@ -245,7 +245,7 @@ else
 fi
 
 echo -n "Testing max gray value less than 1: "
-WHATWEWANT="ERROR: Bad Max Gray Value pepper_MaxgraySmall.pgm"
+WHATWEWANT="ERROR: Bad Max Gray Value (pepper_MaxgraySmall.pgm)"
 WHATWEGET=$(./pgmEcho pepper_MaxgraySmall.pgm temp.pgm)
 ./pgmEcho pepper_MaxgraySmall.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
@@ -259,7 +259,7 @@ else
 fi
 #-----------------Reading in data error-----------------#
 echo -n "Testing data bigger than max gray: "
-WHATWEWANT="ERROR: Bad Data pepper_ValueBig.pgm"
+WHATWEWANT="ERROR: Bad Data (pepper_ValueBig.pgm)"
 WHATWEGET=$(./pgmEcho pepper_ValueBig.pgm temp.pgm)
 ./pgmEcho pepper_ValueBig.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
@@ -273,7 +273,7 @@ else
 fi
 
 echo -n "Testing data smaller than 0: "
-WHATWEWANT="ERROR: Bad Data pepper_ValueSmall.pgm"
+WHATWEWANT="ERROR: Bad Data (pepper_ValueSmall.pgm)"
 WHATWEGET=$(./pgmEcho pepper_ValueSmall.pgm temp.pgm)
 ./pgmEcho pepper_ValueSmall.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
@@ -288,7 +288,7 @@ fi
 #-----------------Testing pgmComp with same and different files-----------------#
 echo -n "Testing different ascii images: "
 WHATWEWANT="DIFFERENT"
-WHATWEGET=$(./pgmComp pepper.ascii.pgm pepper_Different.ascii.pgm)
+WHATWEGET=$(./pgmComp pepper_ascii.pgm pepper_Different_ascii.pgm)
 ./pgmComp pepper.ascii.pgm pepper_Different.ascii.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -302,7 +302,7 @@ fi
 
 echo -n "Testing different binary images: "
 WHATWEWANT="DIFFERENT"
-WHATWEGET=$(./pgmComp pepper.binary.pgm pepper_Different.binary.pgm)
+WHATWEGET=$(./pgmComp pepper_binary.pgm pepper_Different_binary.pgm)
 ./pgmComp pepper.ascii.pgm pepper_Different.ascii.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -316,7 +316,7 @@ fi
 
 echo -n "Testing identical ascii images: "
 WHATWEWANT="IDENTICAL"
-WHATWEGET=$(./pgmComp pepper.ascii.pgm pepper.ascii.pgm)
+WHATWEGET=$(./pgmComp pepper_ascii.pgm pepper_ascii.pgm)
 ./pgmComp pepper.ascii.pgm pepper.ascii.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -330,7 +330,7 @@ fi
 
 echo -n "Testing identical binary images: "
 WHATWEWANT="IDENTICAL"
-WHATWEGET=$(./pgmComp pepper.binary.pgm pepper.binary.pgm)
+WHATWEGET=$(./pgmComp pepper_binary.pgm pepper_binary.pgm)
 ./pgmComp pepper.binary.pgm pepper.binary.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -342,189 +342,3 @@ else
     echo -e "\tRecieved\t${WHATWEGET}"
 fi
 #endtesting
-
-
-
-
-
-# echo -n "Testing no arguments for pgmEcho: "
-# WHATWEWANT="Usage: ./pgmReduce inputImage.pgm reduction_factor outputImage.pgm"
-# WHATWEGET=$(./pgmEcho)
-# if [ "$WHATWEWANT" == "$WHATWEGET" ]
-# then
-#     echo -e "${GREEN}PASSED${NC}"
-# else
-#     echo -e "${RED}FAILED${NC}"
-#     echo -e "\tExpected\t${WHATWEWANT}"
-#     echo -e "\tRecieved\t${WHATWEGET}"
-# fi
-
-# echo -n "Testing no arguments for pgmEcho: "
-# WHATWEWANT="Usage: ./pgmEcho inputImage.pgm outputImage.pgm"
-# WHATWEGET=$(./pgmEcho)
-# if [ "$WHATWEWANT" == "$WHATWEGET" ]
-# then
-#     echo -e "${GREEN}PASSED${NC}"
-# else
-#     echo -e "${RED}FAILED${NC}"
-#     echo -e "\tExpected\t${WHATWEWANT}"
-#     echo -e "\tRecieved\t${WHATWEGET}"
-# fi
-
-# echo -n "Testing no arguments for pgmEcho: "
-# WHATWEWANT="Usage: ./pgmEcho inputImage.pgm outputImage.pgm"
-# WHATWEGET=$(./pgmEcho)
-# if [ "$WHATWEWANT" == "$WHATWEGET" ]
-# then
-#     echo -e "${GREEN}PASSED${NC}"
-# else
-#     echo -e "${RED}FAILED${NC}"
-#     echo -e "\tExpected\t${WHATWEWANT}"
-#     echo -e "\tRecieved\t${WHATWEGET}"
-# fi
-
-# echo -n "Testing no arguments for pgmEcho: "
-# WHATWEWANT="Usage: ./pgmEcho inputImage.pgm outputImage.pgm"
-# WHATWEGET=$(./pgmEcho)
-# if [ "$WHATWEWANT" == "$WHATWEGET" ]
-# then
-#     echo -e "${GREEN}PASSED${NC}"
-# else
-#     echo -e "${RED}FAILED${NC}"
-#     echo -e "\tExpected\t${WHATWEWANT}"
-#     echo -e "\tRecieved\t${WHATWEGET}"
-# fi
-
-# echo -n "Testing no arguments for pgmEcho: "
-# WHATWEWANT="Usage: ./pgmEcho inputImage.pgm outputImage.pgm"
-# WHATWEGET=$(./pgmEcho)
-# if [ "$WHATWEWANT" == "$WHATWEGET" ]
-# then
-#     echo -e "${GREEN}PASSED${NC}"
-# else
-#     echo -e "${RED}FAILED${NC}"
-#     echo -e "\tExpected\t${WHATWEWANT}"
-#     echo -e "\tRecieved\t${WHATWEGET}"
-# fi
-
-# echo -n "Testing no arguments for pgmEcho: "
-# WHATWEWANT="Usage: ./pgmEcho inputImage.pgm outputImage.pgm"
-# WHATWEGET=$(./pgmEcho)
-# if [ "$WHATWEWANT" == "$WHATWEGET" ]
-# then
-#     echo -e "${GREEN}PASSED${NC}"
-# else
-#     echo -e "${RED}FAILED${NC}"
-#     echo -e "\tExpected\t${WHATWEWANT}"
-#     echo -e "\tRecieved\t${WHATWEGET}"
-# fi
-
-# echo -n "Testing no arguments for pgmEcho: "
-# WHATWEWANT="Usage: ./pgmEcho inputImage.pgm outputImage.pgm"
-# WHATWEGET=$(./pgmEcho)
-# if [ "$WHATWEWANT" == "$WHATWEGET" ]
-# then
-#     echo -e "${GREEN}PASSED${NC}"
-# else
-#     echo -e "${RED}FAILED${NC}"
-#     echo -e "\tExpected\t${WHATWEWANT}"
-#     echo -e "\tRecieved\t${WHATWEGET}"
-# fi
-
-# echo -n "Testing no arguments for pgmEcho: "
-# WHATWEWANT="Usage: ./pgmEcho inputImage.pgm outputImage.pgm"
-# WHATWEGET=$(./pgmEcho)
-# if [ "$WHATWEWANT" == "$WHATWEGET" ]
-# then
-#     echo -e "${GREEN}PASSED${NC}"
-# else
-#     echo -e "${RED}FAILED${NC}"
-#     echo -e "\tExpected\t${WHATWEWANT}"
-#     echo -e "\tRecieved\t${WHATWEGET}"
-# fi
-
-# echo -n "Testing no arguments for pgmEcho: "
-# WHATWEWANT="Usage: ./pgmEcho inputImage.pgm outputImage.pgm"
-# WHATWEGET=$(./pgmEcho)
-# if [ "$WHATWEWANT" == "$WHATWEGET" ]
-# then
-#     echo -e "${GREEN}PASSED${NC}"
-# else
-#     echo -e "${RED}FAILED${NC}"
-#     echo -e "\tExpected\t${WHATWEWANT}"
-#     echo -e "\tRecieved\t${WHATWEGET}"
-# fi
-
-# echo -n "Testing no arguments for pgmEcho: "
-# WHATWEWANT="Usage: ./pgmEcho inputImage.pgm outputImage.pgm"
-# WHATWEGET=$(./pgmEcho)
-# if [ "$WHATWEWANT" == "$WHATWEGET" ]
-# then
-#     echo -e "${GREEN}PASSED${NC}"
-# else
-#     echo -e "${RED}FAILED${NC}"
-#     echo -e "\tExpected\t${WHATWEWANT}"
-#     echo -e "\tRecieved\t${WHATWEGET}"
-# fi
-
-# echo -n "Testing no arguments for pgmEcho: "
-# WHATWEWANT="Usage: ./pgmEcho inputImage.pgm outputImage.pgm"
-# WHATWEGET=$(./pgmEcho)
-# if [ "$WHATWEWANT" == "$WHATWEGET" ]
-# then
-#     echo -e "${GREEN}PASSED${NC}"
-# else
-#     echo -e "${RED}FAILED${NC}"
-#     echo -e "\tExpected\t${WHATWEWANT}"
-#     echo -e "\tRecieved\t${WHATWEGET}"
-# fi
-
-# echo -n "Testing no arguments for pgmEcho: "
-# WHATWEWANT="Usage: ./pgmEcho inputImage.pgm outputImage.pgm"
-# WHATWEGET=$(./pgmEcho)
-# if [ "$WHATWEWANT" == "$WHATWEGET" ]
-# then
-#     echo -e "${GREEN}PASSED${NC}"
-# else
-#     echo -e "${RED}FAILED${NC}"
-#     echo -e "\tExpected\t${WHATWEWANT}"
-#     echo -e "\tRecieved\t${WHATWEGET}"
-# fi
-
-# echo -n "Testing no arguments for pgmEcho: "
-# WHATWEWANT="Usage: ./pgmEcho inputImage.pgm outputImage.pgm"
-# WHATWEGET=$(./pgmEcho)
-# if [ "$WHATWEWANT" == "$WHATWEGET" ]
-# then
-#     echo -e "${GREEN}PASSED${NC}"
-# else
-#     echo -e "${RED}FAILED${NC}"
-#     echo -e "\tExpected\t${WHATWEWANT}"
-#     echo -e "\tRecieved\t${WHATWEGET}"
-# fi
-
-
-
-
-
-
-# # WHATWEWANT="ERROR: Bad Argument Count"
-# # WHATWEGET=$(./pgmEcho pepper_HeightBig.pgm)
-# # if [ "$WHATWEWANT" == "$WHATWEGET" ]
-# # then
-# #     echo -e "Output${GREEN}correct$NC"
-# # fi
-
-# # echo $?
-# # ./pgmEcho pepper_HeightBigFake.pgm temp0.pgm
-# # echo $?
-# # ./pgmEcho pepper_BadMagic.pgm temp0.pgm
-# # echo $?
-# # ./pgmEcho pepper_CommentBig.pgm temp0.pgm
-# # echo $?
-# # ./pgmEcho pepper_WidthBig.pgm temp0.pgm
-# # echo $?
-# # ./pgmEcho pepper_MaxgraySmall.pgm temp0.pgm
-# # echo $?
-# # ./pgmEcho pepper_ValueBig.pgm temp0.pgm
-# # echo $?

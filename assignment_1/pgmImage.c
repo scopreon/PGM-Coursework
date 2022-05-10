@@ -35,6 +35,7 @@ int readData(image *ptr_img,long nImageBytes){
 		getc(ptr_img->fileStream);
 	}
 	int scanCount;
+	
 	/*looping through gray values*/
 	for (unsigned char *nextGrayValue = ptr_img->imageData; nextGrayValue < ptr_img->imageData + nImageBytes; nextGrayValue++)
 		{
@@ -52,11 +53,13 @@ int readData(image *ptr_img,long nImageBytes){
 		
 		if ((scanCount != 1) || (grayValue < 0) || (grayValue > ptr_img->maxGray))
 			{
+			
 			return EXIT_BAD_INPUT;
 			}
 
 		*nextGrayValue = (unsigned char) grayValue;
 		}
+		
 		/*checking if there are too many values*/
 		int grayValue=-1;
 		if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
@@ -70,6 +73,7 @@ int readData(image *ptr_img,long nImageBytes){
 			scanCount = fscanf(ptr_img->fileStream, " %u", &grayValue);
 		}
 		if(scanCount!=-1){	
+			
 			return EXIT_BAD_INPUT;
 		}
     return 0;
@@ -150,21 +154,13 @@ int readInFile(image *ptr_img, int intendedFormat){
 	if(magicNumberCheck(ptr_img,0)){return EXIT_BAD_MAGIC_NUMBER;}
 	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
 	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
-	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
-	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
-	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
 	
 	int scanCount = fscanf(ptr_img->fileStream, " ");
 	/*comment line check*/
 	
 	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
 	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
-	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
-	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
-	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
-	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
-	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
-	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+
 	
 	scanCount = fscanf(ptr_img->fileStream, " %u %u", &(ptr_img->width), &(ptr_img->height));
 	
@@ -172,6 +168,7 @@ int readInFile(image *ptr_img, int intendedFormat){
 	//printf("%i %i", ptr_img->width, ptr_img->height);
 	if(sizeCheck(ptr_img,scanCount)){return EXIT_BAD_DIMENSIONS;}
 	//return EXIT_BAD_DIMENSIONS;
+	scanCount = fscanf(ptr_img->fileStream, " ");
 	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
 	scanCount = fscanf(ptr_img->fileStream, " %u", &(ptr_img->maxGray));
 	if(grayCheck(ptr_img)){return EXIT_BAD_MAX_GRAY;}
@@ -182,7 +179,7 @@ int readInFile(image *ptr_img, int intendedFormat){
 	long nImageBytes = ptr_img->width * ptr_img->height * sizeof(unsigned char);
 	ptr_img->imageData = (unsigned char *) malloc(nImageBytes);
 	int r=0;
-	/*reading in data, nImageBytes number of bytes*/
+	/*reading in data, nImageBytes number of  bytes*/
 	if((r=readData(ptr_img,nImageBytes))!=0){
 		free(ptr_img->commentLine);
 		free(ptr_img->imageData);	

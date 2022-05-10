@@ -3,6 +3,7 @@
 #include <ctype.h>
 /* library for memory routines     */
 #include <stdlib.h>
+ #include <string.h>
 #include "fileCheck.h"
 #include "pgmImage.h"
 
@@ -23,7 +24,7 @@ int main(int argc, char **argv)
 	if (argc == 1)	
 		{ /* wrong arg count */
 		/* print an error message        */
-		printf("Usage: %s inputImage.pgm reduction_factor outputImage.pgm\n", argv[0]);
+		printf("Usage: ./pgmTile inputImage.pgm tiling_factor outputImage_<row>_<column>.pgm\n", argv[0]);
 		/* and return an error code      */
 		return EXIT_NO_ERRORS;
 	}
@@ -39,15 +40,23 @@ int main(int argc, char **argv)
     
 	for(int i = 0; argv[2][i]!='\0';i++){
 		if(!isdigit(argv[2][i])){
-			printf("ERROR: Miscellaneous (invalid scaling factor)\n");
+			printf("ERROR: Miscellaneous (invalid tiling factor)\n");
 			return 100;
 		}
 	}
-    
-	// if(!isdigit(argv[2])){
-	// 	printf("ERROR: Miscellaneous (non-numeric scaling factor)\n");
-	// 	return 100;
-	// }
+    char *neededString = malloc(20*sizeof(char));
+	strcpy(neededString,"_<row>_<column>.pgm");
+	//printf("%c",argv[1][strlen(argv[1]));
+	for(int x = 1; x < strlen(neededString)+1;x++){
+		if(neededString[strlen(neededString)-x] != argv[3][strlen(argv[3])-x]){
+			printf("ERROR: Miscellaneous (bad format)\n");
+			return EXIT_MISC;
+		}
+	}
+	char *fileName = malloc(64*sizeof(char));
+	strcpy(fileName,argv[3]);
+	*(fileName-strlen(neededString)+strlen(fileName))='\0';
+	
     int size = atoi(argv[2]);
 	image *ptr_img1 = malloc(sizeof(image));
 	/*initialising image 1*/
@@ -80,21 +89,15 @@ int main(int argc, char **argv)
 	unsigned char *pointerImg2;
     for(int x=0;x<size;x++){
         for(int y=0;y<size;y++){
-            // printf("lol\n");
             pointerImg2 = ptr_img2->imageData;
-            // printf("%p\n",ptr_img1->imageData);
-            // printf("%p\n",ptr_img1->imageData + nImageBytes);
             nImageBytes = ptr_img1->width * ptr_img1->height * sizeof(unsigned char);
             for (unsigned char *nextGrayValue = ptr_img1->imageData; nextGrayValue < ptr_img1->imageData + nImageBytes; nextGrayValue++){
                 /*include this data if condition is met*/
-                //printf("lol\n");
-                // printf("%d\n",*nextGrayValue);
-                //printf("%d\n",(column%ptr_img1->width)/ptr_img2->width);
-                if((column%ptr_img1->width)/ptr_img2->width==x && (row%ptr_img1->height)/ptr_img2->height==y){
+                if((column%ptr_img1->width)/ptr_img2->width==x  && (row%ptr_img1->height)/ptr_img2->height==y){
                     *pointerImg2=*nextGrayValue;
                     pointerImg2++;
                 }
-            
+				
                 column++;
                 if(column%(ptr_img1->width) == 0){
                     row++;
@@ -103,7 +106,7 @@ int main(int argc, char **argv)
             // printf("value: %d\n",*ptr_img2->imageData);
             nImageBytes = ptr_img2->width * ptr_img2->height * sizeof(unsigned char);
             char *name=malloc(sizeof argv[3]);
-            sprintf(name,"%d_%d",x,y);
+            sprintf(name,"%s_%d_%d.pgm",fileName,y,x);
             //printf("%d",*ptr_img2->imageData);
             ptr_img2->fileName=name;
 	        returnVal=writeToFile(ptr_img2, name,nImageBytes);
@@ -116,6 +119,6 @@ int main(int argc, char **argv)
 
 
 	/* at this point, we are done and can exit with a success code */
-	printf("REDUCED\n");
+	printf("TILED\n");
 	return EXIT_NO_ERRORS;
 	} /* main() */

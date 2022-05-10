@@ -35,7 +35,7 @@ int getCommentLine(image *ptr_img){
 		int count=0;
 		for(;;){
 			*pointerToData=fgetc(ptr_img->fileStream);
-			if(*pointerToData == '\n')
+			if(*pointerToData == '\n' || *pointerToData == '\0')
             	break;
 			pointerToData++;
         	++count;
