@@ -23,28 +23,36 @@ int main(int argc, char **argv)
 	if (argc == 1)	
 		{ /* wrong arg count */
 		/* print an error message        */
-		printf("Usage: %s inputImage.pgm reduction_factor outputImage.pgm\n", argv[0]);
+		printf("Usage: ./pgmAssemble outputImage.pgm width height (row column inputImage.pgm)+\n", argv[0]);
 		/* and return an error code      */
 		return EXIT_NO_ERRORS;
 	}
-	if (argc != 4)	
-		{ /* wrong arg count */
-		/* print an error message        */
-		printf("ERROR: Bad Argument Count\n");
-		/* and return an error code      */
-		return EXIT_WRONG_ARG_COUNT;
-	} /* wrong arg count */
+	// if (argc != 4)	
+	// 	{ /* wrong arg count */
+	// 	/* print an error message        */
+	// 	printf("ERROR: Bad Argument Count\n");
+	// 	/* and return an error code      */
+	// 	return EXIT_WRONG_ARG_COUNT;
+	// } /* wrong arg count */
 	/*getting factor size from ascii to int*/
 	for(int i = 0; argv[2][i]!='\0';i++){
 		if(!isdigit(argv[2][i])){
-			printf("ERROR: Miscellaneous (invalid scaling factor)\n");
+			printf("ERROR: Miscellaneous (invalid width)\n");
 			return 100;
 		}
 	}
-	// if(!isdigit(argv[2])){
-	// 	printf("ERROR: Miscellaneous (non-numeric scaling factor)\n");
-	// 	return 100;
-	// }
+    for(int i = 0; argv[3][i]!='\0';i++){
+		if(!isdigit(argv[2][i])){
+			printf("ERROR: Miscellaneous (invalid height)\n");
+			return 100;
+		}
+	}
+    //create array of data
+    //keep adding to it
+
+    
+
+
     int size = atoi(argv[2]);
 	image *ptr_img1 = malloc(sizeof(image));
 	/*initialising image 1*/
