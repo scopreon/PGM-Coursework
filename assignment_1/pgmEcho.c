@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 	}
 
 	
-	long nImageBytes = ptr_img1->width * ptr_img1->height * sizeof(unsigned char);
+	long nImageBytes = ptr_img1->width * sizeof(unsigned char);
 	/*pointer to second image struct, allocating memoty size of image struct*/
 	image *ptr_img2=ptr_img1;
 	ptr_img2->fileName=argv[2];

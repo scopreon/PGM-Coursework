@@ -63,7 +63,14 @@ int main(int argc, char **argv)
 	if(initialiseImage(ptr_img2,argv[3])){
 		return EXIT_BAD_MALLOC;
 	}
+	ptr_img2->width=(int)((float)ptr_img1->width+size-1)/size;
+	ptr_img2->height=(int)((float)ptr_img1->height+size-1)/size;
 	ptr_img2->maxGray=ptr_img1->maxGray;
+	ptr_img2->imageData = malloc(ptr_img2->height * sizeof(*ptr_img2->imageData));
+	nImageBytes = ptr_img2->width * sizeof(unsigned char);
+	for(int i=0;i<ptr_img2->height ;i++){
+		ptr_img2->imageData[i]=malloc(nImageBytes);
+	}
 	ptr_img2->imageData=ptr_img1->imageData;
 	ptr_img2->magic_Number=ptr_img1->magic_Number;
 	
@@ -71,23 +78,31 @@ int main(int argc, char **argv)
 	/*new heights and widths created*/
 	ptr_img2->width=(int)((float)ptr_img1->width+size-1)/size;
 	ptr_img2->height=(int)((float)ptr_img1->height+size-1)/size;
-	int column=0;
-	int row=0;
-	/*pointer to new image data*/
-	unsigned char *pointerImg2 = ptr_img2->imageData;
-	for (unsigned char *nextGrayValue = ptr_img1->imageData; nextGrayValue < ptr_img1->imageData + nImageBytes; nextGrayValue++){
-		/*include this data if condition is met*/
-		if(column%size==0 && row%size==0){
-			*pointerImg2=*nextGrayValue;
-			pointerImg2++;
-		}
-		
-		column++;
-		if(column%(ptr_img1->width) == 0){
-			row++;
+	for(int i = 0; i < ptr_img1->height;i++){
+		for(int j = 0; j < ptr_img1->width;j++){
+			if(i%size==0 && j%size==0){
+				ptr_img2->imageData[i/size][j/size]=ptr_img1->imageData[i][j];
+			}
 		}
 	}
-	nImageBytes = ptr_img2->width * ptr_img2->height * sizeof(unsigned char);
+
+	// int column=0;
+	// int row=0;
+	// /*pointer to new image data*/
+	// unsigned char *pointerImg2 = ptr_img2->imageData;
+	// for (unsigned char *nextGrayValue = ptr_img1->imageData; nextGrayValue < ptr_img1->imageData + nImageBytes; nextGrayValue++){
+	// 	/*include this data if condition is met*/
+	// 	if(column%size==0 && row%size==0){
+	// 		*pointerImg2=*nextGrayValue;
+	// 		pointerImg2++;
+	// 	}
+		
+	// 	column++;
+	// 	if(column%(ptr_img1->width) == 0){
+	// 		row++;
+	// 	}
+	// }
+	nImageBytes = ptr_img2->width * sizeof(unsigned char);
 	returnVal=writeToFile(ptr_img2, argv[3],nImageBytes);
     if(returnVal!=0){
 		return returnVal;

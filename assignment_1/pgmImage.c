@@ -37,28 +37,33 @@ int readData(image *ptr_img,long nImageBytes){
 	int scanCount;
 	
 	/*looping through gray values*/
-	for (unsigned char *nextGrayValue = ptr_img->imageData; nextGrayValue < ptr_img->imageData + nImageBytes; nextGrayValue++)
+	for(int i=0; i<ptr_img->height;i++){
+		for(int j=0;j<ptr_img->width;j++)
+		// for (unsigned char *nextGrayValue = ptr_img->imageData[i]; nextGrayValue < ptr_img->imageData[i] + nImageBytes; nextGrayValue++)
 		{
-		int grayValue = -1;
-		if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
-			/*write single byte if in binary format*/
-			scanCount = fread(&grayValue,1,1,ptr_img->fileStream);
-			grayValue = 256+(int)grayValue;
-		}
-		else{
-			/*write using fscanf, ascii numbers*/
-			scanCount = fscanf(ptr_img->fileStream, " %u", &grayValue);
-			grayValue=(int) (((float) grayValue)/ptr_img->maxGray * 255);
-		}
-		
-		if ((scanCount != 1) || (grayValue < 0) || (grayValue > ptr_img->maxGray))
-			{
-			
-			return EXIT_BAD_INPUT;
+			int grayValue = -1;
+			if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
+				/*write single byte if in binary format*/
+				scanCount = fread(&grayValue,1,1,ptr_img->fileStream);
+				grayValue = 256+(int)grayValue;
 			}
+			else{
+				/*write using fscanf, ascii numbers*/
+				scanCount = fscanf(ptr_img->fileStream, " %u", &grayValue);
+				grayValue=(int) (((float) grayValue)/ptr_img->maxGray * 255);
+			}
+			
+			if ((scanCount != 1) || (grayValue < 0) || (grayValue > ptr_img->maxGray))
+				{
+				
+				return EXIT_BAD_INPUT;
+				}
 
-		*nextGrayValue = (unsigned char) grayValue;
+			// *nextGrayValue = (unsigned char) grayValue;
+			ptr_img->imageData[i][j]=(unsigned char) grayValue;;
 		}
+	}
+	
 		
 		/*checking if there are too many values*/
 		int grayValue=-1;
@@ -102,17 +107,20 @@ int writeData(image *ptr_img,long nImageBytes){
 		/* return an error code          */
 		return 1;
 	} /* dimensional write failed    */
-    for (unsigned char *nextGrayValue = ptr_img->imageData; nextGrayValue < ptr_img->imageData + nImageBytes; nextGrayValue++)
+	for(int i=0; i<ptr_img->height;i++){
+		for(int j=0;j<ptr_img->width;j++)
+		// for (unsigned char *nextGrayValue = ptr_img->imageData[i]; nextGrayValue < ptr_img->imageData[i] + nImageBytes; nextGrayValue++)
             { /* per gray value */
+			//printf("%d\n",*nextGrayValue);
 		/* get next char's column        */
-		int nextCol = (nextGrayValue - ptr_img->imageData + 1) % ptr_img->width;
+		// int nextCol = (nextGrayValue - ptr_img->imageData[i] + 1) % ptr_img->width;
 		/* write the entry & whitespace  */
 		if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
-			nBytesWritten = fwrite(nextGrayValue, 1, 1, ptr_img->fileStream);
+			nBytesWritten = fwrite(&ptr_img->imageData[i][j], 1, 1, ptr_img->fileStream);
 		}
 		else{
-			*nextGrayValue=(int) ((((float) *nextGrayValue)/255 * ptr_img->maxGray));
-			nBytesWritten = fprintf(ptr_img->fileStream, "%d%c", *nextGrayValue, (nextCol ? ' ' : '\n') );
+			ptr_img->imageData[i][j]=(int) ((((float) ptr_img->imageData[i][j])/255 * ptr_img->maxGray));
+			nBytesWritten = fprintf(ptr_img->fileStream, "%d%c", ptr_img->imageData[i][j],' ');
 		
 		}
 
@@ -130,6 +138,12 @@ int writeData(image *ptr_img,long nImageBytes){
 			return 1;
 			} /* data write failed   */
 		} /* per gray value */
+		if(*ptr_img->magic_Number != MAGIC_NUMBER_RAW_PGM){
+			nBytesWritten = fprintf(ptr_img->fileStream, "%c", '\n' );
+		}
+		
+	}
+    
     return 0;
 }
 
@@ -174,10 +188,21 @@ int readInFile(image *ptr_img, int intendedFormat){
 	if(grayCheck(ptr_img)){return EXIT_BAD_MAX_GRAY;}
 	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
 	/*size check*/
-	
 
-	long nImageBytes = ptr_img->width * ptr_img->height * sizeof(unsigned char);
-	ptr_img->imageData = (unsigned char *) malloc(nImageBytes);
+	long nImageBytes = ptr_img->width * sizeof(unsigned char);
+	ptr_img->imageData = malloc(ptr_img->height * sizeof(*ptr_img->imageData));
+	if (ptr_img->imageData == NULL)
+		{
+		printf("ERROR: Image Malloc Failed\n");
+		return EXIT_BAD_MALLOC;
+	}
+	for(int i=0;i<ptr_img->height ;i++){
+		ptr_img->imageData[i]=malloc(nImageBytes);
+			if (ptr_img->imageData[i] == NULL){
+				printf("ERROR: Image Malloc Failed\n");
+				return EXIT_BAD_MALLOC;
+			}
+	}
 	int r=0;
 	/*reading in data, nImageBytes number of  bytes*/
 	if((r=readData(ptr_img,nImageBytes))!=0){

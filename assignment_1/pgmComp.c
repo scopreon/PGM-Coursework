@@ -63,17 +63,25 @@ int main(int argc, char **argv)
 	}
 	long nImageBytes = ptr_img1->width * ptr_img1->height * sizeof(unsigned char);
 	/*pointers to respective image data for each image struct*/
-	unsigned char *nextGrayValue1 = ptr_img1->imageData;
-	unsigned char *nextGrayValue2 = ptr_img2->imageData;
-	while (nextGrayValue1 < ptr_img1->imageData + nImageBytes){
-		int nextCol = (nextGrayValue1 - ptr_img1->imageData + 1) % ptr_img1->width;
-		if(((float) *nextGrayValue2)/ptr_img2->maxGray!=((float) *nextGrayValue1)/ptr_img1->maxGray){
-			printf("DIFFERENT\n");
-			return EXIT_NO_ERRORS;
+	for(int i = 0; i < ptr_img1->height;i++){
+		for(int j = 0; j < ptr_img1->width;j++){
+			if(((float) ptr_img1->imageData[i][j])/ptr_img2->maxGray!=((float) ptr_img2->imageData[i][j])/ptr_img1->maxGray){
+				printf("DIFFERENT\n");
+				return EXIT_NO_ERRORS;
+			}
 		}
-		nextGrayValue1++;
-		nextGrayValue2++;
 	}
+	// unsigned char *nextGrayValue1 = ptr_img1->imageData;
+	// unsigned char *nextGrayValue2 = ptr_img2->imageData;
+	// while (nextGrayValue1 < ptr_img1->imageData + nImageBytes){
+	// 	int nextCol = (nextGrayValue1 - ptr_img1->imageData + 1) % ptr_img1->width;
+		
+	// 		printf("DIFFERENT\n");
+	// 		return EXIT_NO_ERRORS;
+	// 	}
+	// 	nextGrayValue1++;
+	// 	nextGrayValue2++;
+	// }
 	/*the files are identical if it gets to this point*/
 	printf("IDENTICAL\n");
 	return EXIT_NO_ERRORS;

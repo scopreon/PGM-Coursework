@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 		return returnVal;
 	}
 	/*number of bytes image takes up*/
-	long nImageBytes = ptr_img1->width * ptr_img1->height * sizeof(unsigned char);
+	long nImageBytes = ptr_img1->width * sizeof(unsigned char);
 	image *ptr_img2=ptr_img1;
 	ptr_img2->fileName=argv[2];
 	/*magic number values being set for output file*/
