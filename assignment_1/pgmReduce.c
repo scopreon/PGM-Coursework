@@ -1,11 +1,13 @@
-/* library for I/O routines        */
+/* library for I/O routines */
 #include <stdio.h>
+/* library for checking variable types */
 #include <ctype.h>
-/* library for memory routines     */
+/* library for memory routines */
 #include <stdlib.h>
+/* methods for checking file information is valid */
 #include "fileCheck.h"
+/* contains reading and writing functions */
 #include "pgmImage.h"
-
 
 /***********************************/
 /* main routine                    */
@@ -13,27 +15,31 @@
 /* CLI parameters:                 */
 /* argv[0]: executable name        */
 /* argv[1]: input file name        */
-/* argv[2]: output file name       */
+/* argv[2]: reduction factor       */
+/* argv[3]: output file            */
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/
+
 int main(int argc, char **argv)
-	{ /* main() */
-	/* check for correct number of arguments */
+{
+	/* checking for correct number of arguments */
 	if (argc == 1)	
-		{ /* wrong arg count */
-		/* print an error message        */
+	{
+		/* print error message if only 1 argument */
 		printf("Usage: %s inputImage.pgm reduction_factor outputImage.pgm\n", argv[0]);
-		/* and return an error code      */
+		/* return according error code */
 		return EXIT_NO_ERRORS;
 	}
+	
+	/* checking for correct number of arguments */
 	if (argc != 4)	
-		{ /* wrong arg count */
-		/* print an error message        */
+	{
+		/* print error message if wrong number of arguments */
 		printf("ERROR: Bad Argument Count\n");
-		/* and return an error code      */
+		/* return according error code */
 		return EXIT_WRONG_ARG_COUNT;
-	} /* wrong arg count */
+	} 
 	/*getting factor size from ascii to int*/
 	for(int i = 0; argv[2][i]!='\0';i++){
 		if(!isdigit(argv[2][i])){

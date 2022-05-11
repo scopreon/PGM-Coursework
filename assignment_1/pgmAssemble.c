@@ -1,9 +1,14 @@
-/* library for I/O routines        */
+/* library for I/O routines */
 #include <stdio.h>
+/* library for checking variable types */
 #include <ctype.h>
-/* library for memory routines     */
+/* library for math routines */
+#include <math.h>
+/* library for memory routines */
 #include <stdlib.h>
+/* methods for checking file information is valid */
 #include "fileCheck.h"
+/* contains reading and writing functions */
 #include "pgmImage.h"
 
 
@@ -12,28 +17,37 @@
 /*                                 */
 /* CLI parameters:                 */
 /* argv[0]: executable name        */
-/* argv[1]: input file name        */
-/* argv[2]: output file name       */
+/* argv[1]: output file name       */
+/* argv[2]: width                  */
+/* argv[3]: height                 */
+/* argv[i]: position row           */
+/* argv[i+1]: position column      */
+/* argv[i+2]: input file name      */
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/
+
 int main(int argc, char **argv)
-	{ /* main() */
-	/* check for correct number of arguments */
+{
+	/* checking for correct number of arguments */
 	if (argc == 1)	
-		{ /* wrong arg count */
-		/* print an error message        */
+	{
+		/* print error message if only 1 argument */
 		printf("Usage: ./pgmAssemble outputImage.pgm width height (row column inputImage.pgm)+\n", argv[0]);
-		/* and return an error code      */
+		/* return according error code */
 		return EXIT_NO_ERRORS;
 	}
+
+	/* checking for correct number of arguments */
 	if ((argc-1)%3 != 0)	
-		{ /* wrong arg count */
-		/* print an error message        */
+	{
+		/* print error message if wrong number of arguments */
 		printf("ERROR: Bad Argument Count\n");
-		/* and return an error code      */
+		/* return according error code */
 		return EXIT_WRONG_ARG_COUNT;
-	} /* wrong arg count */
+	} 
+	
+	 /* wrong arg count */
 	/*getting factor size from ascii to int*/
 	for(int i = 0; argv[2][i]!='\0';i++){
 		if(!isdigit(argv[2][i])){
@@ -51,30 +65,85 @@ int main(int argc, char **argv)
 	// 	printf("ERROR: Miscellaneous (non-numeric scaling factor)\n");
 	// 	return 100;
 	// }
+	int returnVal;
 	image *ptr_img1 = malloc(sizeof(image));
 	/*initialising image 1*/
 	if(initialiseImage(ptr_img1,argv[1])){
 		return EXIT_BAD_MALLOC;
 	}
 	/*read in first file*/
-	int returnVal;
 	ptr_img1->width=atoi(argv[2]);
 	ptr_img1->height=atoi(argv[3]);
-
-
+	ptr_img1->maxGray=255;
+	long nImageBytes = ptr_img1->width * sizeof(unsigned char);
+	ptr_img1->imageData = malloc(ptr_img1->height * sizeof(*ptr_img1->imageData));
+	if (ptr_img1->imageData == NULL)
+		{
+		printf("ERROR: Image Malloc Failed\n");
+		return EXIT_BAD_MALLOC;
+	}
+	for(int i=0;i<ptr_img1->height ;i++)
+	{
+		ptr_img1->imageData[i]=malloc(nImageBytes);
+		if (ptr_img1->imageData[i] == NULL)
+		{
+			printf("ERROR: Image Malloc Failed\n");
+			return EXIT_BAD_MALLOC;
+		}
+	}
 	// if((returnVal = readInFile(ptr_img1,0))!=0){
 	// 	return returnVal;
 	// }
 
-	long nImageBytes = ptr_img1->width * ptr_img1->height * sizeof(unsigned char);
 	image *ptr_img2 = malloc(sizeof(image));
 	/*initialising image 2*/
 	if(initialiseImage(ptr_img2,argv[3])){
 		return EXIT_BAD_MALLOC;
+	};
+	for(int i  = 0; i < argc;i++){
+		
 	}
-	ptr_img2->maxGray=ptr_img1->maxGray;
-	ptr_img2->imageData=ptr_img1->imageData;
-	ptr_img2->magic_Number=ptr_img1->magic_Number;
+	for(int i = 4;i<argc-2;i+=3){
+		// printf("%s\n",argv[i+2]);
+		
+		ptr_img2->fileName=argv[i+2];
+		for(int x = 0; argv[i][x]!='\0';x++){
+			if(!isdigit(argv[i][x])){
+				printf("ERROR: Miscellaneous (invalid scaling factor)\n");
+				return 100;
+			}
+		}
+		for(int x = 0; argv[i+1][x]!='\0';x++){
+			if(!isdigit(argv[i+1][x])){
+				printf("ERROR: Miscellaneous (invalid scaling factor)\n");
+				return 100;
+			}
+		}
+		if((returnVal = readInFile(ptr_img2,0))!=0){
+			return returnVal;
+		}
+		
+		for(int h = 0;h < ptr_img2->height;h++){
+			for(int w = 0;w < ptr_img2->width;w++){
+				//printf("%d %d %d %d\n",atoi(argv[i+1])+w,w,atoi(argv[i])+h,h);
+				ptr_img1->imageData[atoi(argv[i])+h][atoi(argv[i+1])+w]=ptr_img2->imageData[h][w];
+			}
+		}
+		ptr_img1->magic_Number=ptr_img2->magic_Number;
+		
+	}
+	// for(int h = 0;h < ptr_img1->height;h++){
+	// 	for(int w = 0;w < ptr_img1->width;w++){
+	// 		printf("%d %d %d\n",ptr_img1->imageData[h][w],h,w);
+	// 	}
+	// }
+	returnVal=writeToFile(ptr_img1, ptr_img1->fileName,nImageBytes);
+    if(returnVal!=0){
+		return returnVal;
+	}
+	
+	
+	// ptr_img2->magic_Number=ptr_img1->magic_Number;
 	
 
 	// /*new heights and widths created*/
@@ -111,6 +180,6 @@ int main(int argc, char **argv)
 	// }
 
 	// /* at this point, we are done and can exit with a success code */
-	printf("REDUCED\n");
+	printf("ASSEMBLED\n");
 	return EXIT_NO_ERRORS;
 	} /* main() */

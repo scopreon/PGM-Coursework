@@ -1,11 +1,10 @@
-/* library for I/O routines        */
+/* library for I/O routines */
 #include <stdio.h>
-/* library for memory routines     */
+/* library for memory routines */
 #include <stdlib.h>
-
-/*methods for checking file information*/
+/* methods for checking file information is valid */
 #include "fileCheck.h"
-/*contains reading and writing*/
+/* contains reading and writing functions */
 #include "pgmImage.h"
 
 /***********************************/
@@ -13,28 +12,31 @@
 /*                                 */
 /* CLI parameters:                 */
 /* argv[0]: executable name        */
-/* argv[1]: input file name        */
-/* argv[2]: output file name       */
+/* argv[1]: input ascii file name  */
+/* argv[2]: output binary file name*/
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/
+
 int main(int argc, char **argv)
-	{ /* main() */
-	/* check for correct number of arguments */
+{
+	/* checking for correct number of arguments */
 	if (argc == 1)	
-		{ /* wrong arg count */
-		/* print an error message        */
+	{
+		/* print error message if only 1 argument */
 		printf("Usage: %s inputImage.pgm outputImage.pgm\n", argv[0]);
-		/* and return an error code      */
+		/* return according error code */
 		return EXIT_NO_ERRORS;
 	}
+
+	/* checking for correct number of arguments */
 	if (argc != 3)	
-		{ /* wrong arg count */
-		/* print an error message        */
+	{
+		/* print error message if wrong number of arguments */
 		printf("ERROR: Bad Argument Count\n");
-		/* and return an error code      */
+		/* return according error code */
 		return EXIT_WRONG_ARG_COUNT;
-	} /* wrong arg count */
+	} 
 
 	/*pointer to image struct, allocating memory size of image struct*/
 	image *ptr_img1 = malloc(sizeof(image));

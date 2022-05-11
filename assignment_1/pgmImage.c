@@ -45,7 +45,7 @@ int readData(image *ptr_img,long nImageBytes){
 			if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
 				/*write single byte if in binary format*/
 				scanCount = fread(&grayValue,1,1,ptr_img->fileStream);
-				grayValue = 256+(int)grayValue;
+				grayValue = (int)(unsigned char)grayValue;
 			}
 			else{
 				/*write using fscanf, ascii numbers*/
