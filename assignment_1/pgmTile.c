@@ -44,16 +44,15 @@ int main(int argc, char **argv)
 	} 
 	/*getting factor size from ascii to int*/
     
-	for(int i = 0; argv[2][i]!='\0';i++){
-		if(!isdigit(argv[2][i])){
-			printf("ERROR: Miscellaneous (invalid tiling factor)\n");
-			return 100;
-		}
+	if(!isNumber(argv[2])){
+		printf("ERROR: Miscellaneous (invalid scaling factor)\n");
+		return EXIT_MISC;
 	}
 	
+	/* for storing the required string at end of */
+
     char *neededString = malloc(20*sizeof(char));
 	strcpy(neededString,"_<row>_<column>.pgm");
-	//printf("%c",argv[1][strlen(argv[1]));
 	for(int x = 1; x < strlen(neededString)+1;x++){
 		if(neededString[strlen(neededString)-x] != argv[3][strlen(argv[3])-x]){
 			printf("ERROR: Miscellaneous (bad format)\n");
@@ -83,78 +82,44 @@ int main(int argc, char **argv)
 	if(initialiseImage(ptr_img2,argv[3])){
 		return EXIT_BAD_MALLOC;
 	}
+	/* setting information on second image to be the same as first */
 	ptr_img2->width=ptr_img1->width/size;
 	ptr_img2->height=ptr_img1->height/size;
 	ptr_img2->maxGray=ptr_img1->maxGray;
-	ptr_img2->imageData = malloc(ptr_img2->height * sizeof(*ptr_img2->imageData));
-	long nImageBytes = ptr_img2->width * sizeof(unsigned char);
-	for(int i=0;i<ptr_img2->height ;i++){
-		ptr_img2->imageData[i]=malloc(nImageBytes);
-	}
 	ptr_img2->magic_Number=ptr_img1->magic_Number;
 	
-
-	/*new heights and widths created*/
+	/* dynamically allocating image data for second image */
+	ptr_img2->imageData = malloc(ptr_img2->height * sizeof(*ptr_img2->imageData));
+	for(int i=0;i<ptr_img2->height ;i++){
+		ptr_img2->imageData[i]=malloc(ptr_img2->width * sizeof(unsigned char));
+	}
 	
+
+	/* loop through tiles, _0_0 ... _n_n */
 	for(int x=0;x<size;x++){
     	for(int y=0;y<size;y++){
-			for(int i=0;i<ptr_img1->height;i++){
-				for(int j=0;j<ptr_img1->width;j++){
-					if((i%ptr_img1->height)/ptr_img2->height==x  && (j%ptr_img1->width)/ptr_img2->width==y){
-						ptr_img2->imageData[i-ptr_img2->height*x][j-ptr_img2->width*y]=ptr_img1->imageData[i][j];
-						
-					}
+			/* loop through pixels of tile and set each one */
+			for(int i=0;i<ptr_img2->height;i++){
+				for(int j=0;j<ptr_img2->width;j++){
+					/* take data for each tile being created */
+					ptr_img2->imageData[i][j]=ptr_img1->imageData[i+ptr_img2->height*x][j+ptr_img2->width*y];
 				}
 			}
 			
-			nImageBytes = ptr_img2->width * sizeof(unsigned char);
+			/* name will store formatted name of tile filename */
             char *name=malloc(sizeof argv[3]);
             sprintf(name,"%s_%d_%d.pgm",fileName,x,y);
-            //printf("%d",*ptr_img2->imageData);
+
+			/* assign filename to new tile and write */
             ptr_img2->fileName=name;
-	        returnVal=writeToFile(ptr_img2, name,nImageBytes);
+	        returnVal=writeToFile(ptr_img2);
             if(returnVal!=0){
 		        return returnVal;
 	        }
 		}
 	}
 
-	// int column=0;
-	// int row=0;
-	// /*pointer to new image data*/
-	// unsigned char *pointerImg2;
-    // for(int x=0;x<size;x++){
-    //     for(int y=0;y<size;y++){
-    //         pointerImg2 = ptr_img2->imageData;
-    //         nImageBytes = ptr_img1->width * ptr_img1->height * sizeof(unsigned char);
-    //         for (unsigned char *nextGrayValue = ptr_img1->imageData; nextGrayValue < ptr_img1->imageData + nImageBytes; nextGrayValue++){
-    //             /*include this data if condition is met*/
-    //             if((column%ptr_img1->width)/ptr_img2->width==x  && (row%ptr_img1->height)/ptr_img2->height==y){
-    //                 *pointerImg2=*nextGrayValue;
-    //                 pointerImg2++;
-    //             }
-				
-    //             column++;
-    //             if(column%(ptr_img1->width) == 0){
-    //                 row++;
-    //             }
-    //         }
-    //         // printf("value: %d\n",*ptr_img2->imageData);
-    //         nImageBytes = ptr_img2->width * ptr_img2->height * sizeof(unsigned char);
-    //         char *name=malloc(sizeof argv[3]);
-    //         sprintf(name,"%s_%d_%d.pgm",fileName,y,x);
-    //         //printf("%d",*ptr_img2->imageData);
-    //         ptr_img2->fileName=name;
-	//         returnVal=writeToFile(ptr_img2, name,nImageBytes);
-    //         if(returnVal!=0){
-	// 	        return returnVal;
-	//         }
-    //     }
-    // }
-
-
-
 	/* at this point, we are done and can exit with a success code */
 	printf("TILED\n");
 	return EXIT_NO_ERRORS;
-	} /* main() */
+}

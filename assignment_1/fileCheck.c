@@ -3,7 +3,16 @@
 #include "fileCheck.h"
 #include "pgmImage.h"
 
-//error for wrong intended format
+/***********************************/
+/* main routine                    */
+/*                                 */
+/* CLI parameters:                 */
+/* argv[0]: executable name        */
+/* argv[1]: input file name        */
+/* argv[2]: output file name       */
+/* returns 0 on success            */
+/* non-zero error code on fail     */
+/***********************************/
 int magicNumberCheck(image *ptr_img,int magicNumberVerify){
     if ((*ptr_img->magic_Number != MAGIC_NUMBER_ASCII_PGM && *ptr_img->magic_Number != MAGIC_NUMBER_RAW_PGM)||
 	 (*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM && magicNumberVerify==1)||
@@ -15,18 +24,25 @@ int magicNumberCheck(image *ptr_img,int magicNumberVerify){
 		printf("ERROR: Bad Magic Number (%s)\n", ptr_img->fileName);
 		/* and return                    */
 		return 1;
-		} /* failed magic number check   */
+	} /* failed magic number check   */
     else{
         return 0;
     }
 	
 }
-
+/***********************************/
+/* main routine                    */
+/*                                 */
+/* CLI parameters:                 */
+/* argv[0]: executable name        */
+/* argv[1]: input file name        */
+/* argv[2]: output file name       */
+/* returns 0 on success            */
+/* non-zero error code on fail     */
+/***********************************/
 int getCommentLine(image *ptr_img){
     char nextChar = fgetc(ptr_img->fileStream);
-    if (nextChar == '#')
-        
-		{ /* comment line                */
+    if (nextChar == '#'){
 		/* allocate buffer               */
 		ptr_img->commentLine = (char *) malloc(MAX_COMMENT_LINE_LENGTH);
 		char *pointerToData=ptr_img->commentLine;
@@ -35,8 +51,10 @@ int getCommentLine(image *ptr_img){
 		int count=0;
 		for(;;){
 			*pointerToData=fgetc(ptr_img->fileStream);
-			if(*pointerToData == '\n' || *pointerToData == '\0')
-            	break;
+			if(*pointerToData == '\n' || *pointerToData == '\0'){
+				break;
+			}
+            	
 			pointerToData++;
         	++count;
 			if(count>127){
@@ -60,7 +78,16 @@ int getCommentLine(image *ptr_img){
 }
 
 
-
+/***********************************/
+/* main routine                    */
+/*                                 */
+/* CLI parameters:                 */
+/* argv[0]: executable name        */
+/* argv[1]: input file name        */
+/* argv[2]: output file name       */
+/* returns 0 on success            */
+/* non-zero error code on fail     */
+/***********************************/
 int sizeCheck(image *ptr_img,int scanCount){
     if 	(
 		(scanCount != 2				)	||
@@ -68,8 +95,7 @@ int sizeCheck(image *ptr_img,int scanCount){
 		(ptr_img->width 	>= MAX_IMAGE_DIMENSION	) 	||
 		(ptr_img->height < MIN_IMAGE_DIMENSION	) 	||
 		(ptr_img->height >= MAX_IMAGE_DIMENSION	) 
-		)
-		{ /* failed size sanity check    */
+		){
 		/* free up the memory            */
 		free(ptr_img->commentLine);
 
@@ -87,13 +113,21 @@ int sizeCheck(image *ptr_img,int scanCount){
         return 0;
     }
 }
-
+/***********************************/
+/* main routine                    */
+/*                                 */
+/* CLI parameters:                 */
+/* argv[0]: executable name        */
+/* argv[1]: input file name        */
+/* argv[2]: output file name       */
+/* returns 0 on success            */
+/* non-zero error code on fail     */
+/***********************************/
 int grayCheck(image *ptr_img){
     if 	(
 		(ptr_img->maxGray	> 255		)||
 		(ptr_img->maxGray	< 1		)
-		)
-		{ /* failed size sanity check    */
+		){ /* failed size sanity check    */
 		/* free up the memory            */
 		free(ptr_img->commentLine);
 
@@ -105,7 +139,7 @@ int grayCheck(image *ptr_img){
 		
 		/* and return                    */
 		return 1;
-		} /* failed size sanity check    */
+	} /* failed size sanity check    */
     else{
         return 0;
     }
