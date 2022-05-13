@@ -1,6 +1,7 @@
 #ifndef _FILECHECK_H_
 #define _FILECHECK_H_
 #include "pgmImage.h"
+
 /* ERROR codes to exit with */
 #define EXIT_NO_ERRORS 0
 #define EXIT_WRONG_ARG_COUNT 1
@@ -22,10 +23,14 @@
 #define MAX_IMAGE_DIMENSION 65536
 #define MAX_COMMENT_LINE_LENGTH 128
 
-/* functions */
+/* functions: */
+/* validates magic number for image */
 int magicNumberCheck(image *ptr_img1,int magicNumberVerify);
+/* validates length of comment line (if applicable) */
 int getCommentLine(image *ptr_img1);
+/* check dimensions of image, width/height */
 int sizeCheck(image *ptr_img1,int scanCount);
+/* checks max gray value of image */
 int grayCheck(image *ptr_img);
 
 #endif

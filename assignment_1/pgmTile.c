@@ -53,8 +53,8 @@ int main(int argc, char **argv)
 
     char *neededString = malloc(20*sizeof(char));
 	strcpy(neededString,"_<row>_<column>.pgm");
-	for(int x = 1; x < strlen(neededString)+1;x++){
-		if(neededString[strlen(neededString)-x] != argv[3][strlen(argv[3])-x]){
+	for(int charCheckIndex = 1; charCheckIndex < strlen(neededString)+1; charCheckIndex++){
+		if(neededString[strlen(neededString)-charCheckIndex] != argv[3][strlen(argv[3])-charCheckIndex]){
 			printf("ERROR: Miscellaneous (bad format)\n");
 			return EXIT_MISC;
 		}
@@ -90,19 +90,19 @@ int main(int argc, char **argv)
 	
 	/* dynamically allocating image data for second image */
 	ptr_img2->imageData = malloc(ptr_img2->height * sizeof(*ptr_img2->imageData));
-	for(int i=0;i<ptr_img2->height ;i++){
-		ptr_img2->imageData[i]=malloc(ptr_img2->width * sizeof(unsigned char));
+	for(int rowMalloc=0; rowMalloc<ptr_img2->height; rowMalloc++){
+		ptr_img2->imageData[rowMalloc]=malloc(ptr_img2->width * sizeof(unsigned char));
 	}
 	
 
-	/* loop through tiles, _0_0 ... _n_n */
+	/* loop through tiles, _0_0 ... _x_y */
 	for(int x=0;x<size;x++){
     	for(int y=0;y<size;y++){
 			/* loop through pixels of tile and set each one */
-			for(int i=0;i<ptr_img2->height;i++){
-				for(int j=0;j<ptr_img2->width;j++){
+			for(int loopRow=0; loopRow<ptr_img2->height; loopRow++){
+				for(int loopCol=0; loopCol<ptr_img2->width; loopCol++){
 					/* take data for each tile being created */
-					ptr_img2->imageData[i][j]=ptr_img1->imageData[i+ptr_img2->height*x][j+ptr_img2->width*y];
+					ptr_img2->imageData[loopRow][loopCol]=ptr_img1->imageData[loopRow+ptr_img2->height*x][loopCol+ptr_img2->width*y];
 				}
 			}
 			

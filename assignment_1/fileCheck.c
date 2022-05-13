@@ -1,77 +1,85 @@
+/* library for I/O routines */
 #include <stdio.h>
+/* library for memory routines */
 #include <stdlib.h>
+/* methods for checking file information is valid */
 #include "fileCheck.h"
+/* contains reading and writing functions */
 #include "pgmImage.h"
 
 /***********************************/
-/* main routine                    */
+/* magicNumberCheck function       */
 /*                                 */
 /* CLI parameters:                 */
-/* argv[0]: executable name        */
-/* argv[1]: input file name        */
-/* argv[2]: output file name       */
+/* argv[0]: pointer to image struct*/
+/* argv[1]: format to read in file */
+/*  -> 0 if binary/ascii           */
+/*  -> 1 if ascii                  */
+/*  -> 2 if binary                 */
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/
+ 
 int magicNumberCheck(image *ptr_img,int magicNumberVerify){
-    if ((*ptr_img->magic_Number != MAGIC_NUMBER_ASCII_PGM && *ptr_img->magic_Number != MAGIC_NUMBER_RAW_PGM)||
-	 (*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM && magicNumberVerify==1)||
-	 ( *ptr_img->magic_Number ==  MAGIC_NUMBER_ASCII_PGM && magicNumberVerify==2))
-		{ /* failed magic number check   */
-		/* be tidy: close the file       */
+    /* checks if magic number is the one we want, binary/ascii/either */
+	if ((*ptr_img->magic_Number != MAGIC_NUMBER_ASCII_PGM && *ptr_img->magic_Number != MAGIC_NUMBER_RAW_PGM)||
+	 	(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM && magicNumberVerify==1)							||
+	 	(*ptr_img->magic_Number ==  MAGIC_NUMBER_ASCII_PGM && magicNumberVerify==2)){
+		/* if magic number does not match exit with bad magic number, free memory */
         fclose(ptr_img->fileStream);
-		/* print an error message */
 		printf("ERROR: Bad Magic Number (%s)\n", ptr_img->fileName);
-		/* and return                    */
 		return 1;
-	} /* failed magic number check   */
+	}
     else{
         return 0;
     }
 	
 }
+
 /***********************************/
-/* main routine                    */
+/* getCommentLine function         */
 /*                                 */
-/* CLI parameters:                 */
-/* argv[0]: executable name        */
-/* argv[1]: input file name        */
-/* argv[2]: output file name       */
+/* parameters:                     */
+/* argv[0]: pointer to image struct*/
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/
+
 int getCommentLine(image *ptr_img){
+	/* get next character in file stream, if it is a # the line is a comment */
     char nextChar = fgetc(ptr_img->fileStream);
     if (nextChar == '#'){
-		/* allocate buffer               */
+		/* allocate memory for the comment line */
 		ptr_img->commentLine = (char *) malloc(MAX_COMMENT_LINE_LENGTH);
+
+		/* created pointer which points to commment line in file */
 		char *pointerToData=ptr_img->commentLine;
-		/* fgets() reads a line          */
-		/* capture return value          */
+		/* counter which counts number of characters */
 		int count=0;
+
+		/* loop until you reach end of comment or comment is too big */
 		for(;;){
+			/* get next character and check if it is a newline, if so then exit */
 			*pointerToData=fgetc(ptr_img->fileStream);
 			if(*pointerToData == '\n' || *pointerToData == '\0'){
 				break;
 			}
-            	
-			pointerToData++;
+            
+			/* increment count */
         	++count;
+			/* if count is too big comment is too big, exit with bad comment line */
 			if(count>127){
 				free(ptr_img->commentLine);
-			/* close file            */
 				fclose(ptr_img->fileStream);
-
-			/* print an error message */
 				printf("ERROR: Bad Comment Line (%s)\n",ptr_img->fileName);	
-		
-			/* and return            */
 				return 1;
 			}
 		}
+		/* if it has left the for loop the comment is valid and we can exit with 0 */
 		return 0;
-	} /* comment line */
+	}
     else{
+		/* if the character wasn't a # it was useful data so put the character back in the stream and return */
         ungetc(nextChar, ptr_img->fileStream);
         return 0;
     }
@@ -79,68 +87,56 @@ int getCommentLine(image *ptr_img){
 
 
 /***********************************/
-/* main routine                    */
+/* getCommentLine function         */
 /*                                 */
-/* CLI parameters:                 */
-/* argv[0]: executable name        */
-/* argv[1]: input file name        */
-/* argv[2]: output file name       */
+/* parameters:                     */
+/* argv[0]: pointer to image struct*/
+/* argv[1]: numebr of items read in*/
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/
+
 int sizeCheck(image *ptr_img,int scanCount){
-    if 	(
-		(scanCount != 2				)	||
-		(ptr_img->width 	< MIN_IMAGE_DIMENSION	) 	||
-		(ptr_img->width 	>= MAX_IMAGE_DIMENSION	) 	||
+	/* check if scancount is 2 (read in both width and height) */
+	/* check he width and height read in is in a valid range */
+    if 	((scanCount != 2)							||
+		(ptr_img->width < MIN_IMAGE_DIMENSION	) 	||
+		(ptr_img->width >= MAX_IMAGE_DIMENSION	) 	||
 		(ptr_img->height < MIN_IMAGE_DIMENSION	) 	||
-		(ptr_img->height >= MAX_IMAGE_DIMENSION	) 
-		){
-		/* free up the memory            */
+		(ptr_img->height >= MAX_IMAGE_DIMENSION	)){
+		/* free everything up if width/height aren't valid */
 		free(ptr_img->commentLine);
-
-		/* be tidy: close file pointer   */
 		fclose(ptr_img->fileStream);
-
-		/* print an error message */
 		printf("ERROR: Bad Dimensions (%s)\n", ptr_img->fileName);	
-		
-		/* and return                    */
 		return 1;
 	}
-		 /* failed size sanity check    */
     else{
+		/* if everything is valid return 0 */
         return 0;
     }
 }
+
 /***********************************/
-/* main routine                    */
+/* grayCheck function              */
 /*                                 */
-/* CLI parameters:                 */
-/* argv[0]: executable name        */
-/* argv[1]: input file name        */
-/* argv[2]: output file name       */
+/* parameters:                     */
+/* argv[0]: pointer to image struct*/
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/
+
 int grayCheck(image *ptr_img){
-    if 	(
-		(ptr_img->maxGray	> 255		)||
-		(ptr_img->maxGray	< 1		)
-		){ /* failed size sanity check    */
-		/* free up the memory            */
+	/* checking if max gray value is valid 1->255, if not return error and string */
+    if 	((ptr_img->maxGray	> 255		)||
+		(ptr_img->maxGray	< 1		)){
+		/* free memory and exit with string */
 		free(ptr_img->commentLine);
-
-		/* be tidy: close file pointer   */
 		fclose(ptr_img->fileStream);
-
-		/* print an error message */
 		printf("ERROR: Bad Max Gray Value (%s)\n", ptr_img->fileName);	
-		
-		/* and return                    */
 		return 1;
-	} /* failed size sanity check    */
+	}
     else{
+		/* max gray value is valid, return with no errorand continue to read data */
         return 0;
     }
 }

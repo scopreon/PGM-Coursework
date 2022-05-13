@@ -1,10 +1,17 @@
+/* library for I/O routines */
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+/* library for checking variable types */
 #include <ctype.h>
-#include "pgmImage.h"
+/* library for memory routines */
+#include <stdlib.h>
+/* library for string routines */
+#include <string.h>
+/* library for math routines */
+#include <math.h>
+/* methods for checking file information is valid */
 #include "fileCheck.h"
+/* contains reading and writing functions */
+#include "pgmImage.h"
 
 /***********************************/
 /* isNumber function               */
@@ -17,10 +24,10 @@
 
 int isNumber(char *text){
 	/* loop through all letters in text */
-	for(int i = 0; text[i]!='\0';i++){
+	for(int characterPosition = 0; text[characterPosition]!='\0'; characterPosition++){
 		/* if any characers aren't string */
 		/* note: this also detects . and - as non digits so this function checks if positive integer */
-		if(!isdigit(text[i])){
+		if(!isdigit(text[characterPosition])){
 			return 0;
 		}
 	}
@@ -60,7 +67,7 @@ int initialiseImage(image *ptr_img,char *fileName){
 /***********************************/
 /* readData function               */
 /*                                 */
-/* CLI parameters:                 */
+/* parameters:                     */
 /* argv[0]: pointer to image struct*/
 /* returns 0 on success            */
 /* non-zero error code on fail     */
@@ -74,8 +81,8 @@ int readData(image *ptr_img){
 
 	int scanCount;
 	/* looping through gray values to read in and store in image struct*/
-	for(int i=0; i<ptr_img->height;i++){
-		for(int j=0;j<ptr_img->width;j++){
+	for(int loopRow=0; loopRow<ptr_img->height; loopRow++){
+		for(int loopCol=0; loopCol<ptr_img->width; loopCol++){
 			int grayValue = -1;
 			/* read in data according to a specific format */
 			if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
@@ -93,7 +100,7 @@ int readData(image *ptr_img){
 				return EXIT_BAD_INPUT;
 			}
 			/* save the value in image data */
-			ptr_img->imageData[i][j]=(unsigned char) grayValue;;
+			ptr_img->imageData[loopRow][loopCol]=(unsigned char) grayValue;
 		}
 	}
 	int grayValue=-1;
@@ -111,160 +118,179 @@ int readData(image *ptr_img){
 	}
     return 0;
 }
-/*-----------------------------------------------------------------------------------*/
+
 /***********************************/
-/* main routine                    */
+/* writeData function              */
 /*                                 */
-/* CLI parameters:                 */
-/* argv[0]: executable name        */
-/* argv[1]: input file name        */
-/* argv[2]: output file name       */
+/* parameters:                     */
+/* argv[0]: pointer to image struct*/
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/
+
 int writeData(image *ptr_img){
-    if (ptr_img->fileStream == NULL)
-		{
-		free(ptr_img->commentLine);
-		free(ptr_img->imageData);
-		printf("ERROR: Output Failed (%s)\n", ptr_img->fileName);	
+	/* checking if filestream is empty, means file cannot be written to if NULL */
+    if (ptr_img->fileStream == NULL){
 		return 1;
-		}
+	}
+
+	/* writing magic number, width and height to file */
 	size_t nBytesWritten = fprintf(ptr_img->fileStream, "%s\n%d %d\n%d\n", (char *) ptr_img->magic_Number,ptr_img->width, ptr_img->height, ptr_img->maxGray);
-    if (nBytesWritten < 0){
-		 /* dimensional write failed    */
-		/* free memory                   */
-		free(ptr_img->commentLine);
-		free(ptr_img->imageData);
-
-		/* print an error message        */
-		printf("ERROR: Output Failed (%s)\n", ptr_img->fileName);	
-
-		/* return an error code          */
+    /* checking if it wrote correctly */
+	if (nBytesWritten < 0){
 		return 1;
-	} /* dimensional write failed    */
-	for(int i=0; i<ptr_img->height;i++){
-		for(int j=0;j<ptr_img->width;j++){
-		if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
-			nBytesWritten = fwrite(&ptr_img->imageData[i][j], 1, 1, ptr_img->fileStream);
+	}
+
+	/* loop through all pixel values in 2D array and write each one to file */
+	for(int loopRow=0; loopRow<ptr_img->height; loopRow++){
+		for(int loopCol=0; loopCol<ptr_img->width; loopCol++){
+			/* check method of writing, ascii or binary */
+			if(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM){
+				/* writing a single byte to file, binary format */ 
+				nBytesWritten = fwrite(&ptr_img->imageData[loopRow][loopCol], 1, 1, ptr_img->fileStream);
+			}
+			else{
+				/* mapping data to intended gray value, 1->255 */
+				ptr_img->imageData[loopRow][loopCol]=(int) ((((float) ptr_img->imageData[loopRow][loopCol])/255 * ptr_img->maxGray));
+				/* writing that value to file in format " %d", ascii format */
+				nBytesWritten = fprintf(ptr_img->fileStream, "%d%c", ptr_img->imageData[loopRow][loopCol],' ');
+			}
+
+			/* checking if each write passed, return error if failed */
+			if (nBytesWritten < 0){
+				return 1;
+			}
 		}
-		else{
-			ptr_img->imageData[i][j]=(int) ((((float) ptr_img->imageData[i][j])/255 * ptr_img->maxGray));
-			nBytesWritten = fprintf(ptr_img->fileStream, "%d%c", ptr_img->imageData[i][j],' ');
-		
-		}
-
-		/* sanity check on write         */
-		if (nBytesWritten < 0){
-			/* free memory           */
-			free(ptr_img->commentLine);
-			free(ptr_img->imageData);
-
-			/* print error message   */
-			printf("ERROR: Output Failed (%s)\n", ptr_img->fileName);	
-
-			/* return an error code  */
-			return 1;
-			} /* data write failed   */
-		} /* per gray value */
+		/* write newline character at end of each rows */
 		if(*ptr_img->magic_Number != MAGIC_NUMBER_RAW_PGM){
 			nBytesWritten = fprintf(ptr_img->fileStream, "%c", '\n' );
 		}
 		
 	}
-    
+
+    /* all data has been written successfully, return 0 */
     return 0;
 }
+
 /***********************************/
-/* main routine                    */
+/* readInFile function             */
 /*                                 */
-/* CLI parameters:                 */
-/* argv[0]: executable name        */
-/* argv[1]: input file name        */
-/* argv[2]: output file name       */
+/* parameters:                     */
+/* argv[0]: pointer to image struct*/
+/* argv[1]: format to read in file */
+/*  -> 0 if binary/ascii           */
+/*  -> 1 if ascii                  */
+/*  -> 2 if binary                 */
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/
+
 int readInFile(image *ptr_img, int intendedFormat){
-	/*initialising magic number*/
-	ptr_img->magic_number[0] = '0';
-	ptr_img->magic_number[1] = '0';
+	/* linking magic number characters to magic_Number pointer */
 	ptr_img->magic_Number=(unsigned short *) ptr_img->magic_number;
+	/* reading in file to filestream using fopen */
 	ptr_img->fileStream =  fopen(ptr_img->fileName, "r");
 	
-	
+	/* checking if fileStream is NULL when reading in file */
 	if (ptr_img->fileStream == NULL){
 		printf("ERROR: Bad File Name (%s)\n",ptr_img->fileName);
 		return EXIT_BAD_FILE_NAME;
 	}
 	
+	/* reading in digits of magic number individually */
 	ptr_img->magic_number[0] = getc(ptr_img->fileStream);
 	ptr_img->magic_number[1] = getc(ptr_img->fileStream);
 	
+	/* verifying magic numvber is valid regardless of format (binary/ascii) */
 	if(magicNumberCheck(ptr_img,0)){return EXIT_BAD_MAGIC_NUMBER;}
-	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	
+	/* check for a comment line */
 	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
 	
+	/* read in blank space */
 	int scanCount = fscanf(ptr_img->fileStream, " ");
-	/*comment line check*/
 	
-	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+	/* check for a comment line */
 	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
 
-	
+	/* read in image width and height and check if they are valid */
 	scanCount = fscanf(ptr_img->fileStream, " %u %u", &(ptr_img->width), &(ptr_img->height));
-	
-	/*check gray value*/
+	/* check if dimensions are valid, reuturn error code if invalid */
 	if(sizeCheck(ptr_img,scanCount)){return EXIT_BAD_DIMENSIONS;}
-	scanCount = fscanf(ptr_img->fileStream, " ");
-	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
-	scanCount = fscanf(ptr_img->fileStream, " %u", &(ptr_img->maxGray));
-	if(grayCheck(ptr_img)){return EXIT_BAD_MAX_GRAY;}
-	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
-	/*size check*/
 
-	long nImageBytes = ptr_img->width * sizeof(unsigned char);
+	/* read in blank character */
+	scanCount = fscanf(ptr_img->fileStream, " ");
+	/* check for comment line */
+	if(getCommentLine(ptr_img)){return EXIT_BAD_COMMENT_LINE;}
+
+	/* read in max gray value from file stream */
+	scanCount = fscanf(ptr_img->fileStream, " %u", &(ptr_img->maxGray));
+	/* check if max gray value is valid, 1 -> 255, return error if invalid */
+	if(grayCheck(ptr_img)){return EXIT_BAD_MAX_GRAY;}
+	
+	/* allocate memory to store image data */
 	ptr_img->imageData = malloc(ptr_img->height * sizeof(*ptr_img->imageData));
+	/* check if memoery was allocated correctly */
 	if (ptr_img->imageData == NULL){
 		printf("ERROR: Image Malloc Failed\n");
 		return EXIT_BAD_MALLOC;
 	}
-	for(int i=0;i<ptr_img->height ;i++){
-		ptr_img->imageData[i]=malloc(nImageBytes);
-		if (ptr_img->imageData[i] == NULL){
+
+	/* loop through image data and allocate memory to each pointer, thereby creating a 2D array */
+	for(int mallocRow=0; mallocRow<ptr_img->height; mallocRow++){
+		ptr_img->imageData[mallocRow]=malloc(ptr_img->width * sizeof(unsigned char));
+		/* check if each imageData[i] has been allocated correctly , return error if failed */
+		if (ptr_img->imageData[mallocRow] == NULL){
 			printf("ERROR: Image Malloc Failed\n");
 			return EXIT_BAD_MALLOC;
 		}
 	}
+
+	/* reading in the gray values of the image */
 	int r=0;
-	/*reading in data, nImageBytes number of  bytes*/
 	if((r=readData(ptr_img))!=0){
+		/* if read data isn't valid free everything and return error code */
 		free(ptr_img->commentLine);
 		free(ptr_img->imageData);	
-
 		fclose(ptr_img->fileStream);
-
 		printf("ERROR: Bad Data (%s)\n", ptr_img->fileName);	
 		return r;
 	}
-	if(magicNumberCheck(ptr_img,intendedFormat)){return EXIT_BAD_MAGIC_NUMBER;}
+
+	/* check if magic number is valid for pgma2b amd pgmb2a */
+	if(magicNumberCheck(ptr_img,intendedFormat)){
+		free(ptr_img->commentLine);
+		free(ptr_img->imageData);	
+		return EXIT_BAD_MAGIC_NUMBER;
+	}
+	
+	/* at this point we have read in data and all is valid, close filstream and return no errors */
 	fclose(ptr_img->fileStream);
     return EXIT_NO_ERRORS;
 }
+
 /***********************************/
-/* main routine                    */
+/* writeToFail function            */
 /*                                 */
-/* CLI parameters:                 */
-/* argv[0]: executable name        */
-/* argv[1]: input file name        */
-/* argv[2]: output file name       */
+/* parameters:                     */
+/* argv[0]: pointer to image struct*/
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/
+
 int writeToFile(image *ptr_img){
+	/* opens file to write to, stored pointer in fileSteam */
     ptr_img->fileStream = fopen(ptr_img->fileName, "w");
+
+	/* write the data stored in its imageData to the file with fileName */
     if(writeData(ptr_img)){
+		/* if it fails free everything and return error with string */
+		free(ptr_img->commentLine);
+		free(ptr_img->imageData);
+		printf("ERROR: Output Failed (%s)\n", ptr_img->fileName);	
 		return EXIT_BAD_OUTPUT;
 	}
+
+	/* if no write errors we can exit, file has been written successfully */
     return EXIT_NO_ERRORS;
 }

@@ -79,15 +79,15 @@ int main(int argc, char **argv)
 
 	/* malloc data for output file */
 	ptr_img2->imageData = malloc(ptr_img2->height * sizeof(*ptr_img2->imageData));
-	for(int i=0;i<ptr_img2->height ;i++){
-		ptr_img2->imageData[i]=malloc(ptr_img2->width * sizeof(unsigned char));
+	for(int rowMalloc = 0; rowMalloc < ptr_img2->height; rowMalloc++){
+		ptr_img2->imageData[rowMalloc]=malloc(ptr_img2->width * sizeof(unsigned char));
 	}
 
 	/* loop through data selecting every size'th value */
-	for(int i = 0; i < ptr_img2->height;i++){
-		for(int j = 0; j < ptr_img2->width;j++){
-			/* move data from first pgm o second pgm */
-			ptr_img2->imageData[i][j]=ptr_img1->imageData[i*size][j*size];
+	for(int loopRow = 0; loopRow < ptr_img2->height; loopRow++){
+		for(int loopCol = 0; loopCol < ptr_img2->width;loopCol++){
+			/* move data from first pgm to second pgm */
+			ptr_img2->imageData[loopRow][loopCol]=ptr_img1->imageData[loopRow*size][loopCol*size];
 		}
 	}
 

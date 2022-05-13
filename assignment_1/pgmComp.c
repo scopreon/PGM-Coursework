@@ -65,10 +65,10 @@ int main(int argc, char **argv){
 	}
 
 	/* loop though each pixel in first image and compare it to second */
-	for(int i = 0; i < ptr_img1->height;i++){
-		for(int j = 0; j < ptr_img1->width;j++){
+	for(int loopRow = 0; loopRow < ptr_img1->height; loopRow++){
+		for(int loopCol = 0; loopCol < ptr_img1->width; loopCol++){
 			/* compare data, scale it according to max gray value */
-			if(((float) ptr_img1->imageData[i][j])/ptr_img2->maxGray!=((float) ptr_img2->imageData[i][j])/ptr_img1->maxGray){
+			if(((float) ptr_img1->imageData[loopRow][loopCol])/ptr_img2->maxGray != ((float) ptr_img2->imageData[loopRow][loopCol])/ptr_img1->maxGray){
 				/* if something doesn't match they are different */
 				printf("DIFFERENT\n");
 				return EXIT_NO_ERRORS;

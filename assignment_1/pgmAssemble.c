@@ -72,11 +72,9 @@ int main(int argc, char **argv)
 	ptr_img1->maxGray=255;
 
 	/* allocating memory for storing image data in 2D format*/
-	long nImageBytes = ptr_img1->width * sizeof(unsigned char);
 	ptr_img1->imageData = malloc(ptr_img1->height * sizeof(*ptr_img1->imageData));
-	for(int i=0;i<ptr_img1->height ;i++)
-	{
-		ptr_img1->imageData[i]=malloc(nImageBytes);
+	for(int mallocRow=0; mallocRow<ptr_img1->height; mallocRow++){
+		ptr_img1->imageData[mallocRow]=malloc(ptr_img1->width * sizeof(unsigned char));
 	}
 
 	/* creating image 2 which stores images incrementally read in */
@@ -87,17 +85,16 @@ int main(int argc, char **argv)
 	};
 
 	/* looping through command line arguments in triplets */
-	for(int i = 4;i<argc-2;i+=3){
-		
+	for(int argumentIndex = 4; argumentIndex<argc-2; argumentIndex+=3){	
 		/* the third argument in each triplet is the filename to read in */
-		ptr_img2->fileName=argv[i+2];
+		ptr_img2->fileName=argv[argumentIndex+2];
 
 		/* making sure coordinates (x,y) to put the image are integers */
-		if(!isNumber(argv[i])){
+		if(!isNumber(argv[argumentIndex])){
 			printf("ERROR: Miscellaneous (invalid image position)\n");
 			return EXIT_MISC;
 		}
-		if(!isNumber(argv[i+1])){
+		if(!isNumber(argv[argumentIndex+1])){
 			printf("ERROR: Miscellaneous (invalid image position)\n");
 			return EXIT_MISC;
 		}
@@ -108,10 +105,10 @@ int main(int argc, char **argv)
 		}
 		
 		/* loop through file data and add it to first image blank canvas image data */
-		for(int h = 0;h < ptr_img2->height;h++){
-			for(int w = 0;w < ptr_img2->width;w++){
+		for(int loopRow = 0; loopRow < ptr_img2->height; loopRow++){
+			for(int loopCol = 0; loopCol < ptr_img2->width; loopCol++){
 				/* move data from image two to image one*/
-				ptr_img1->imageData[atoi(argv[i])+h][atoi(argv[i+1])+w]=ptr_img2->imageData[h][w];
+				ptr_img1->imageData[atoi(argv[argumentIndex])+loopRow][atoi(argv[argumentIndex+1])+loopCol]=ptr_img2->imageData[loopRow][loopCol];
 			}
 		}
 
