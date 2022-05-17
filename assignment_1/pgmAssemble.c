@@ -91,11 +91,11 @@ int main(int argc, char **argv)
 
 		/* making sure coordinates (x,y) to put the image are integers */
 		if(!isNumber(argv[argumentIndex])){
-			printf("ERROR: Miscellaneous (invalid image position)\n");
+			printf("ERROR: Miscellaneous (invalid image-x position)\n");
 			return EXIT_MISC;
 		}
 		if(!isNumber(argv[argumentIndex+1])){
-			printf("ERROR: Miscellaneous (invalid image position)\n");
+			printf("ERROR: Miscellaneous (invalid image-y position)\n");
 			return EXIT_MISC;
 		}
 

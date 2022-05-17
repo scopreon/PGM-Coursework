@@ -6,7 +6,6 @@ typedef struct Image{
     int height;
     int width;
     int maxGray;
-    char *commentLine;
     FILE *fileStream;
     char *fileName;
     unsigned char **imageData;

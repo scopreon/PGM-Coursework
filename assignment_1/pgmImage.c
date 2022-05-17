@@ -54,9 +54,9 @@ int initialiseImage(image *ptr_img,char *fileName){
 	ptr_img->height=0;
     ptr_img->width=0;
     ptr_img->maxGray=255;
-    ptr_img->commentLine=NULL;
     ptr_img->fileStream=NULL;
-    ptr_img->fileName=fileName;
+	ptr_img->fileName=malloc(sizeof(char)*strlen(fileName));
+	strcpy(ptr_img->fileName,fileName);
     ptr_img->imageData=NULL;
     ptr_img->magic_Number=NULL;
 	ptr_img->magic_number[0] = '0';
@@ -250,7 +250,6 @@ int readInFile(image *ptr_img, int intendedFormat){
 	int r=0;
 	if((r=readData(ptr_img))!=0){
 		/* if read data isn't valid free everything and return error code */
-		free(ptr_img->commentLine);
 		free(ptr_img->imageData);	
 		fclose(ptr_img->fileStream);
 		printf("ERROR: Bad Data (%s)\n", ptr_img->fileName);	
@@ -259,7 +258,6 @@ int readInFile(image *ptr_img, int intendedFormat){
 
 	/* check if magic number is valid for pgma2b amd pgmb2a */
 	if(magicNumberCheck(ptr_img,intendedFormat)){
-		free(ptr_img->commentLine);
 		free(ptr_img->imageData);	
 		return EXIT_BAD_MAGIC_NUMBER;
 	}
@@ -285,7 +283,6 @@ int writeToFile(image *ptr_img){
 	/* write the data stored in its imageData to the file with fileName */
     if(writeData(ptr_img)){
 		/* if it fails free everything and return error with string */
-		free(ptr_img->commentLine);
 		free(ptr_img->imageData);
 		printf("ERROR: Output Failed (%s)\n", ptr_img->fileName);	
 		return EXIT_BAD_OUTPUT;

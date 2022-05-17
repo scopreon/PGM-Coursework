@@ -8,6 +8,34 @@
 #include "pgmImage.h"
 
 /***********************************/
+/* freeMemory function      	   */
+/*                                 */
+/* CLI parameters:                 */
+/* argv[0]: pointer to image struct*/
+/* returns 0 on success            */
+/* non-zero error code on fail     */
+/***********************************/
+
+int freeMemory(image *ptr_img){
+	// /* free filename if it has been allocated */
+	if(ptr_img->fileName != NULL){
+		free(ptr_img->fileName);
+	}
+	// /* free image data if it has been allocated */
+	// if(ptr_img->imageData != NULL){
+	// 	for(int height = 0; height < ptr_img->height; height++){
+	// 		free(ptr_img->imageData[height]);
+	// 	}
+	// 	free(ptr_img->imageData);
+	// }
+	// /* close filestream if it has been allocated */
+	if(ptr_img->fileStream != NULL){
+		fclose(ptr_img->fileStream);
+	}
+	return 0;
+}
+
+/***********************************/
 /* magicNumberCheck function       */
 /*                                 */
 /* CLI parameters:                 */
@@ -26,8 +54,8 @@ int magicNumberCheck(image *ptr_img,int magicNumberVerify){
 	 	(*ptr_img->magic_Number == MAGIC_NUMBER_RAW_PGM && magicNumberVerify==1)							||
 	 	(*ptr_img->magic_Number ==  MAGIC_NUMBER_ASCII_PGM && magicNumberVerify==2)){
 		/* if magic number does not match exit with bad magic number, free memory */
-        fclose(ptr_img->fileStream);
 		printf("ERROR: Bad Magic Number (%s)\n", ptr_img->fileName);
+		freeMemory(ptr_img);
 		return 1;
 	}
     else{
@@ -49,19 +77,16 @@ int getCommentLine(image *ptr_img){
 	/* get next character in file stream, if it is a # the line is a comment */
     char nextChar = fgetc(ptr_img->fileStream);
     if (nextChar == '#'){
-		/* allocate memory for the comment line */
-		ptr_img->commentLine = (char *) malloc(MAX_COMMENT_LINE_LENGTH);
-
 		/* created pointer which points to commment line in file */
-		char *pointerToData=ptr_img->commentLine;
+		char commentChar;
 		/* counter which counts number of characters */
 		int count=0;
 
 		/* loop until you reach end of comment or comment is too big */
 		for(;;){
 			/* get next character and check if it is a newline, if so then exit */
-			*pointerToData=fgetc(ptr_img->fileStream);
-			if(*pointerToData == '\n' || *pointerToData == '\0'){
+			commentChar=fgetc(ptr_img->fileStream);
+			if(commentChar == '\n' || commentChar == '\0'){
 				break;
 			}
             
@@ -69,9 +94,9 @@ int getCommentLine(image *ptr_img){
         	++count;
 			/* if count is too big comment is too big, exit with bad comment line */
 			if(count>127){
-				free(ptr_img->commentLine);
-				fclose(ptr_img->fileStream);
+				
 				printf("ERROR: Bad Comment Line (%s)\n",ptr_img->fileName);	
+				freeMemory(ptr_img);
 				return 1;
 			}
 		}
@@ -105,9 +130,9 @@ int sizeCheck(image *ptr_img,int scanCount){
 		(ptr_img->height < MIN_IMAGE_DIMENSION	) 	||
 		(ptr_img->height >= MAX_IMAGE_DIMENSION	)){
 		/* free everything up if width/height aren't valid */
-		free(ptr_img->commentLine);
-		fclose(ptr_img->fileStream);
+		
 		printf("ERROR: Bad Dimensions (%s)\n", ptr_img->fileName);	
+		freeMemory(ptr_img);
 		return 1;
 	}
     else{
@@ -130,9 +155,9 @@ int grayCheck(image *ptr_img){
     if 	((ptr_img->maxGray	> 255		)||
 		(ptr_img->maxGray	< 1		)){
 		/* free memory and exit with string */
-		free(ptr_img->commentLine);
-		fclose(ptr_img->fileStream);
+		
 		printf("ERROR: Bad Max Gray Value (%s)\n", ptr_img->fileName);	
+		freeMemory(ptr_img);
 		return 1;
 	}
     else{
