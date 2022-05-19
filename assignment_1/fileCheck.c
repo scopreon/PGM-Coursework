@@ -17,18 +17,11 @@
 /***********************************/
 
 int freeMemory(image *ptr_img){
-	// /* free filename if it has been allocated */
+	/* free filename if it has been allocated */
 	if(ptr_img->fileName != NULL){
 		free(ptr_img->fileName);
 	}
-	// /* free image data if it has been allocated */
-	// if(ptr_img->imageData != NULL){
-	// 	for(int height = 0; height < ptr_img->height; height++){
-	// 		free(ptr_img->imageData[height]);
-	// 	}
-	// 	free(ptr_img->imageData);
-	// }
-	// /* close filestream if it has been allocated */
+	/* close filestream if it has been allocated */
 	if(ptr_img->fileStream != NULL){
 		fclose(ptr_img->fileStream);
 	}

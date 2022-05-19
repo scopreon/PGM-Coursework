@@ -32,5 +32,7 @@ int getCommentLine(image *ptr_img1);
 int sizeCheck(image *ptr_img1,int scanCount);
 /* checks max gray value of image */
 int grayCheck(image *ptr_img);
+/* frees memory */
+int freeMemory(image *ptr_img);
 
 #endif

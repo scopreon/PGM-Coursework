@@ -13,7 +13,6 @@ typedef struct Image{
     unsigned char magic_number[2];
 }image;
 
-
 /* functions: */
 /* handles reading in file */
 int readInFile(image *ptr_img, int intendedFormat);
