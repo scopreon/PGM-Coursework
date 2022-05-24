@@ -12,6 +12,36 @@
 #include "pgmImage.h"
 
 /***********************************/
+/* stringExists function           */
+/*                                 */
+/* CLI parameters:                 */
+/* argv[0]: string to check        */
+/* argv[1]: substring to find      */
+/* returns the index of the string */
+/* -1 on not found                 */
+/***********************************/
+
+int stringExists(char *string, char *stringToFind){
+	/* loop through string */	
+	for(int i = 0; i < strlen(string); i++){
+		int counter=strlen(stringToFind);
+		
+		/* loop through next few characters to see if match */		
+		for(int j = 0; j < strlen(stringToFind); j++){
+			/* if string matches decrement counter */
+			if(stringToFind[j]==string[i+j]){
+				counter-=1;
+			}
+		}
+		if(counter==0){
+			return i;
+		}
+	}
+	/* return -1 if not found */
+	return -1;
+}
+
+/***********************************/
 /* main routine                    */
 /*                                 */
 /* CLI parameters:                 */
@@ -51,17 +81,15 @@ int main(int argc, char **argv)
 	
 	/* for storing the required string at end of */
 
-    char *neededString = malloc(20*sizeof(char));
-	strcpy(neededString,"_<row>_<column>.pgm");
-	for(int charCheckIndex = 1; charCheckIndex < strlen(neededString)+1; charCheckIndex++){
-		if(neededString[strlen(neededString)-charCheckIndex] != argv[3][strlen(argv[3])-charCheckIndex]){
-			printf("ERROR: Miscellaneous (bad format)\n");
-			return EXIT_MISC;
-		}
+	int positionRow=stringExists(argv[3],"<row>");
+	int positionCol=stringExists(argv[3],"<column>");
+
+	if(positionRow==-1||positionCol==-1){
+		printf("ERROR: Miscellaneous (incorrect format)\n");
+	 	return EXIT_MISC;
 	}
-	char *fileName = malloc(64*sizeof(char));
-	strcpy(fileName,argv[3]);
-	*(fileName-strlen(neededString)+strlen(fileName))='\0';
+	
+	//char *fileName = malloc(64*sizeof(char));
 	
     int size = atoi(argv[2]);
 	image *ptr_img1 = malloc(sizeof(image));
@@ -76,7 +104,6 @@ int main(int argc, char **argv)
 		return returnVal;
 	}
 	
-
 	image *ptr_img2 = malloc(sizeof(image));
 	/*initialising image 2*/
 	if(initialiseImage(ptr_img2,argv[3])){
@@ -94,7 +121,6 @@ int main(int argc, char **argv)
 		ptr_img2->imageData[rowMalloc]=malloc(ptr_img2->width * sizeof(unsigned char));
 	}
 	
-
 	/* loop through tiles, _0_0 ... _x_y */
 	for(int x=0;x<size;x++){
     	for(int y=0;y<size;y++){
@@ -107,8 +133,24 @@ int main(int argc, char **argv)
 			}
 			
 			/* name will store formatted name of tile filename */
-            char *name=malloc(sizeof argv[3]);
-            sprintf(name,"%s_%d_%d.pgm",fileName,x,y);
+			//exit(0);
+            char *name=(char *) malloc(strlen(argv[3])*sizeof(char));
+			name[0]='\0';
+			
+			/* add characters/numbers to name */
+			for(int i = 0; i < strlen(argv[3]); i++){
+				if(i==positionRow){
+					i+=4;
+					sprintf(name,"%s%d",name,x);
+				}
+				else if(i==positionCol){
+					i+=7;
+					sprintf(name,"%s%d",name,y);
+				}
+				else{
+					sprintf(name,"%s%c",name,argv[3][i]);
+				}
+			}
 
 			/* assign filename to new tile and write */
             ptr_img2->fileName=name;

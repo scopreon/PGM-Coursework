@@ -9,7 +9,7 @@
 /* methods for checking file information is valid */
 #include "fileCheck.h"
 /* contains reading and writing functions */
-#include "pgmImage.h"
+#include "gtopoImage.h"
 
 
 /***********************************/
@@ -33,13 +33,13 @@ int main(int argc, char **argv)
 	if (argc == 1)	
 	{
 		/* print error message if only 1 argument */
-		printf("Usage: ./pgmAssemble outputImage.pgm width height (row column inputImage.pgm)+\n", argv[0]);
+		printf("Usage: %s outputFile width height (row column inputFile widthheight)+ \n", argv[0]);
 		/* return according error code */
 		return EXIT_NO_ERRORS;
 	}
 
 	/* checking for correct number of arguments */
-	if ((argc-1)%3 != 0)	
+	if ((argc+1)%5 != 0)	
 	{
 		/* print error message if wrong number of arguments */
 		printf("ERROR: Bad Argument Count\n");
@@ -48,12 +48,7 @@ int main(int argc, char **argv)
 	} 
 	
 	/* ensure width is an integer */
-	if(!isNumber(argv[2])){
-		printf("ERROR: Miscellaneous (invalid scaling factor)\n");
-		return EXIT_MISC;
-	}
-	/* ensure height is an integer */
-	if(!isNumber(argv[3])){
+	if(!isNumber(argv[2]) || !isNumber(argv[3])){
 		printf("ERROR: Miscellaneous (invalid scaling factor)\n");
 		return EXIT_MISC;
 	}
@@ -69,38 +64,34 @@ int main(int argc, char **argv)
 	/* initialising data for template image */
 	ptr_img1->width=atoi(argv[2]);
 	ptr_img1->height=atoi(argv[3]);
-	ptr_img1->maxGray=255;
 
 	/* allocating memory for storing image data in 2D format*/
 	ptr_img1->imageData = malloc(ptr_img1->height * sizeof(*ptr_img1->imageData));
 	for(int mallocRow=0; mallocRow<ptr_img1->height; mallocRow++){
-		ptr_img1->imageData[mallocRow]=malloc(ptr_img1->width * sizeof(unsigned char));
+		ptr_img1->imageData[mallocRow]=malloc(ptr_img1->width * sizeof(short int));
 	}
 
 	/* creating image 2 which stores images incrementally read in */
 	image *ptr_img2 = malloc(sizeof(image));
 	/* initialising image 1 with basic data */
-	if(initialiseImage(ptr_img2,argv[3])){
+	if(initialiseImage(ptr_img2,argv[1])){
 		return EXIT_BAD_MALLOC;
 	};
 
 	/* looping through command line arguments in triplets */
-	for(int argumentIndex = 4; argumentIndex<argc-2; argumentIndex+=3){	
+	for(int argumentIndex = 4; argumentIndex<argc-2; argumentIndex+=5){	
 		/* the third argument in each triplet is the filename to read in */
 		ptr_img2->fileName=argv[argumentIndex+2];
 
 		/* making sure coordinates (x,y) to put the image are integers */
-		if(!isNumber(argv[argumentIndex])){
-			printf("ERROR: Miscellaneous (invalid image-x position)\n");
+		if(!isNumber(argv[argumentIndex]) || !isNumber(argv[argumentIndex+1]) || !isNumber(argv[argumentIndex+3]) || !isNumber(argv[argumentIndex+4])){
+			printf("ERROR: Miscellaneous (non-integer values)\n");
 			return EXIT_MISC;
 		}
-		if(!isNumber(argv[argumentIndex+1])){
-			printf("ERROR: Miscellaneous (invalid image-y position)\n");
-			return EXIT_MISC;
-		}
-
+		ptr_img2->width=atoi(argv[argumentIndex+3]);
+		ptr_img2->height=atoi(argv[argumentIndex+4]);
 		/* read in each file to assemble */
-		if((returnVal = readInFile(ptr_img2,0))!=0){
+		if((returnVal = readInFile(ptr_img2))!=0){
 			return returnVal;
 		}
 		
@@ -113,8 +104,6 @@ int main(int argc, char **argv)
 		}
 
 		/* set the magic number of read in file to final assembled image magic number */
-		ptr_img1->magic_Number=ptr_img2->magic_Number;
-		
 	}
 	
 	/* final assembled image is written to image */

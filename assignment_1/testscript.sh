@@ -92,7 +92,7 @@ fi
 #-----------------Testing for incorrect number of arguments > 0-----------------#
 echo -n "Testing incorrect numbers of arguments for pgmEcho: "
 WHATWEWANT="ERROR: Bad Argument Count"
-WHATWEGET=$(./pgmEcho pepper.ascii.pgm)
+WHATWEGET=$(./pgmEcho images/pepper.ascii.pgm)
 ./pgmEcho pepper.ascii.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -106,7 +106,7 @@ fi
 
 echo -n "Testing incorrect numbers of arguments for pgmComp: "
 WHATWEWANT="ERROR: Bad Argument Count"
-WHATWEGET=$(./pgmComp pepper.ascii.pgm)
+WHATWEGET=$(./pgmComp images/pepper.ascii.pgm)
 ./pgmComp pepper.ascii.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -120,7 +120,7 @@ fi
 
 echo -n "Testing incorrect numbers of arguments for pgma2b: "
 WHATWEWANT="ERROR: Bad Argument Count"
-WHATWEGET=$(./pgma2b pepper.ascii.pgm)
+WHATWEGET=$(./pgma2b images/pepper.ascii.pgm)
 ./pgma2b pepper.ascii.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -134,7 +134,7 @@ fi
 
 echo -n "Testing incorrect numbers of arguments for pgmb2a: "
 WHATWEWANT="ERROR: Bad Argument Count"
-WHATWEGET=$(./pgmb2a pepper.ascii.pgm)
+WHATWEGET=$(./pgmb2a images/pepper.ascii.pgm)
 ./pgmb2a pepper.binary.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -148,7 +148,7 @@ fi
 
 echo -n "Testing incorrect numbers of arguments for pgmReduce: "
 WHATWEWANT="ERROR: Bad Argument Count"
-WHATWEGET=$(./pgmReduce pepper.ascii.pgm)
+WHATWEGET=$(./pgmReduce images/pepper.ascii.pgm)
 ./pgmReduce pepper.ascii.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -161,8 +161,8 @@ else
 fi
 #-----------------Testing formating, gray, width, height etc...-----------------#
 echo -n "Testing comment line too big: "
-WHATWEWANT="ERROR: Bad Comment Line (pepper_CommentBig.pgm)"
-WHATWEGET=$(./pgmEcho pepper_CommentBig.pgm temp.pgm)
+WHATWEWANT="ERROR: Bad Comment Line (images/pepper_CommentBig.pgm)"
+WHATWEGET=$(./pgmEcho images/pepper_CommentBig.pgm images/temp.pgm)
 ./pgmEcho pepper_CommentBig.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -175,8 +175,8 @@ else
 fi
 
 echo -n "Testing width value too big: "
-WHATWEWANT="ERROR: Bad Dimensions (pepper_WidthBig.pgm)"
-WHATWEGET=$(./pgmEcho pepper_WidthBig.pgm temp.pgm)
+WHATWEWANT="ERROR: Bad Dimensions (images/pepper_WidthBig.pgm)"
+WHATWEGET=$(./pgmEcho images/pepper_WidthBig.pgm images/temp.pgm)
 ./pgmEcho pepper_WidthBig.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -189,8 +189,8 @@ else
 fi
 
 echo -n "Testing width value less than 1: "
-WHATWEWANT="ERROR: Bad Dimensions (pepper_WidthSmall.pgm)"
-WHATWEGET=$(./pgmEcho pepper_WidthSmall.pgm temp.pgm)
+WHATWEWANT="ERROR: Bad Dimensions (images/pepper_WidthSmall.pgm)"
+WHATWEGET=$(./pgmEcho images/pepper_WidthSmall.pgm images/temp.pgm)
 ./pgmEcho pepper_WidthSmall.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -203,8 +203,8 @@ else
 fi
 
 echo -n "Testing height value too big: "
-WHATWEWANT="ERROR: Bad Dimensions (pepper_HeightBig.pgm)"
-WHATWEGET=$(./pgmEcho pepper_HeightBig.pgm temp.pgm)
+WHATWEWANT="ERROR: Bad Dimensions (images/pepper_HeightBig.pgm)"
+WHATWEGET=$(./pgmEcho images/pepper_HeightBig.pgm images/temp.pgm)
 ./pgmEcho pepper_HeightBig.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -217,8 +217,8 @@ else
 fi
 
 echo -n "Testing height value less than 1: "
-WHATWEWANT="ERROR: Bad Dimensions (pepper_HeightSmall.pgm)"
-WHATWEGET=$(./pgmEcho pepper_HeightSmall.pgm temp.pgm)
+WHATWEWANT="ERROR: Bad Dimensions (images/pepper_HeightSmall.pgm)"
+WHATWEGET=$(./pgmEcho images/pepper_HeightSmall.pgm images/temp.pgm)
 ./pgmEcho pepper_HeightSmall.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -231,8 +231,8 @@ else
 fi
 
 echo -n "Testing max gray value greater than 255: "
-WHATWEWANT="ERROR: Bad Max Gray Value (pepper_MaxgrayBig.pgm)"
-WHATWEGET=$(./pgmEcho pepper_MaxgrayBig.pgm temp.pgm)
+WHATWEWANT="ERROR: Bad Max Gray Value (images/pepper_MaxgrayBig.pgm)"
+WHATWEGET=$(./pgmEcho images/pepper_MaxgrayBig.pgm images/temp.pgm)
 ./pgmEcho pepper_MaxgrayBig.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -245,8 +245,8 @@ else
 fi
 
 echo -n "Testing max gray value less than 1: "
-WHATWEWANT="ERROR: Bad Max Gray Value (pepper_MaxgraySmall.pgm)"
-WHATWEGET=$(./pgmEcho pepper_MaxgraySmall.pgm temp.pgm)
+WHATWEWANT="ERROR: Bad Max Gray Value (images/pepper_MaxgraySmall.pgm)"
+WHATWEGET=$(./pgmEcho images/pepper_MaxgraySmall.pgm images/temp.pgm)
 ./pgmEcho pepper_MaxgraySmall.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -259,8 +259,8 @@ else
 fi
 #-----------------Reading in data error-----------------#
 echo -n "Testing data bigger than max gray: "
-WHATWEWANT="ERROR: Bad Data (pepper_ValueBig.pgm)"
-WHATWEGET=$(./pgmEcho pepper_ValueBig.pgm temp.pgm)
+WHATWEWANT="ERROR: Bad Data (images/pepper_ValueBig.pgm)"
+WHATWEGET=$(./pgmEcho images/pepper_ValueBig.pgm images/temp.pgm)
 ./pgmEcho pepper_ValueBig.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -273,8 +273,8 @@ else
 fi
 
 echo -n "Testing data smaller than 0: "
-WHATWEWANT="ERROR: Bad Data (pepper_ValueSmall.pgm)"
-WHATWEGET=$(./pgmEcho pepper_ValueSmall.pgm temp.pgm)
+WHATWEWANT="ERROR: Bad Data (images/pepper_ValueSmall.pgm)"
+WHATWEGET=$(./pgmEcho images/pepper_ValueSmall.pgm images/temp.pgm)
 ./pgmEcho pepper_ValueSmall.pgm temp.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -288,7 +288,7 @@ fi
 #-----------------Testing pgmComp with same and different files-----------------#
 echo -n "Testing different ascii images: "
 WHATWEWANT="DIFFERENT"
-WHATWEGET=$(./pgmComp pepper_ascii.pgm pepper_Different_ascii.pgm)
+WHATWEGET=$(./pgmComp images/pepper_ascii.pgm images/pepper_Different_ascii.pgm)
 ./pgmComp pepper.ascii.pgm pepper_Different.ascii.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -302,7 +302,7 @@ fi
 
 echo -n "Testing different binary images: "
 WHATWEWANT="DIFFERENT"
-WHATWEGET=$(./pgmComp pepper_binary.pgm pepper_Different_binary.pgm)
+WHATWEGET=$(./pgmComp images/pepper_binary.pgm images/pepper_Different_binary.pgm)
 ./pgmComp pepper.ascii.pgm pepper_Different.ascii.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -316,7 +316,7 @@ fi
 
 echo -n "Testing identical ascii images: "
 WHATWEWANT="IDENTICAL"
-WHATWEGET=$(./pgmComp pepper_ascii.pgm pepper_ascii.pgm)
+WHATWEGET=$(./pgmComp images/pepper_ascii.pgm images/pepper_ascii.pgm)
 ./pgmComp pepper.ascii.pgm pepper.ascii.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]
@@ -330,7 +330,7 @@ fi
 
 echo -n "Testing identical binary images: "
 WHATWEWANT="IDENTICAL"
-WHATWEGET=$(./pgmComp pepper_binary.pgm pepper_binary.pgm)
+WHATWEGET=$(./pgmComp images/pepper_binary.pgm images/pepper_binary.pgm)
 ./pgmComp pepper.binary.pgm pepper.binary.pgm > /dev/null 2>&1
 VALUE=$?
 if [ "$WHATWEWANT" == "$WHATWEGET" ]

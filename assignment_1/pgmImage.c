@@ -55,7 +55,7 @@ int initialiseImage(image *ptr_img,char *fileName){
     ptr_img->width=0;
     ptr_img->maxGray=255;
     ptr_img->fileStream=NULL;
-	ptr_img->fileName=malloc(sizeof(char)*strlen(fileName));
+	ptr_img->fileName=malloc(sizeof(char)*(strlen(fileName)+1));
 	strcpy(ptr_img->fileName,fileName);
     ptr_img->imageData=NULL;
     ptr_img->magic_Number=NULL;
