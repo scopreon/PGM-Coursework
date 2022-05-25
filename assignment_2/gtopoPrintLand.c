@@ -90,7 +90,7 @@ int main(int argc, char **argv){
     }
 
 	/* if it reaches this point is has echoed correctly */
-	printf("ECHOED\n");
+	printf("PRINTED\n");
 	/* return no error code */
 	return EXIT_NO_ERRORS;
 }

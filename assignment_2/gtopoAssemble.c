@@ -23,6 +23,8 @@
 /* argv[i]: position row           */
 /* argv[i+1]: position column      */
 /* argv[i+2]: input file name      */
+/* argv[i+3]: image width          */
+/* argv[i+4]: image height         */
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/
@@ -94,7 +96,12 @@ int main(int argc, char **argv)
 		if((returnVal = readInFile(ptr_img2))!=0){
 			return returnVal;
 		}
-		
+		for(int loopRow = 0; loopRow < ptr_img1->height; loopRow++){
+			for(int loopCol = 0; loopCol < ptr_img1->width; loopCol++){
+				/* filling with empty data to create blank canvas */
+				ptr_img1->imageData[loopRow][loopCol]=-9999;
+			}
+		}
 		/* loop through file data and add it to first image blank canvas image data */
 		for(int loopRow = 0; loopRow < ptr_img2->height; loopRow++){
 			for(int loopCol = 0; loopCol < ptr_img2->width; loopCol++){

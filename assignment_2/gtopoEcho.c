@@ -56,8 +56,6 @@ int main(int argc, char **argv){
 	if(returnVal!=0){
 		return returnVal;
 	}
-	
-	/* the ammount of memory needed for each row of the image to store */
 
 	/*pointer to second image struct, allocating memoty size of image struct*/
 	image *ptr_img2=ptr_img1;

@@ -83,10 +83,9 @@ int readData(image *ptr_img){
 			grayValue1 = (unsigned short int) grayValue1;
 			/* ensuring a gray value read in and it is valid */
 			if ((scanCount != 1) || (grayValue1 < 1)){
-				printf("%d,%d",loopCol,loopRow);
 				return EXIT_BAD_INPUT;
 			}
-			/* save the value in image data */
+			/* convert to little endian, from big endian */
 			unsigned short int grayValue2=(grayValue1>>8)|(grayValue1<<8);
 			ptr_img->imageData[loopRow][loopCol]=(short int) grayValue2;
 		}
@@ -94,10 +93,10 @@ int readData(image *ptr_img){
 	int grayValue=-1;
 	/* try read in another value, if this passes we have too much data */
 	/* check if too much data was read in, return bad input if it did */
-	// if(fread(&grayValue,1,1,ptr_img->fileStream)!=0){	
-	// 	printf("test");
-	// 	return EXIT_BAD_INPUT;
-	// }
+	if(fread(&grayValue,1,1,ptr_img->fileStream)!=0){	
+		printf("test");
+		return EXIT_BAD_INPUT;
+	}
     return 0;
 }
 

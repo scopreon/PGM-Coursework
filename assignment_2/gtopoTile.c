@@ -149,7 +149,6 @@ int main(int argc, char **argv)
 
 			/* assign filename to new tile and write */
             ptr_img2->fileName=name;
-			printf("%s\n",name);
 	        returnVal=writeToFile(ptr_img2);
             if(returnVal!=0){
 		        return returnVal;

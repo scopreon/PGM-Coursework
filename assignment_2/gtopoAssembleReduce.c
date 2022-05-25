@@ -20,9 +20,12 @@
 /* argv[1]: output file name       */
 /* argv[2]: width                  */
 /* argv[3]: height                 */
+/* argv[4]: reduction factor       */
 /* argv[i]: position row           */
 /* argv[i+1]: position column      */
 /* argv[i+2]: input file name      */
+/* argv[i+3]: image width          */
+/* argv[i+4]: image height         */
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/
@@ -139,8 +142,7 @@ int main(int argc, char **argv)
     if(returnVal!=0){
 		return returnVal;
 	}
-    printf("width: %d\n", ptr_img3->width);
-    printf("height: %d\n", ptr_img3->height);
+
 	/* by this point the image has been assembled correctly and we can exit*/
 	printf("ASSEMBLED\n");
 	return EXIT_NO_ERRORS;

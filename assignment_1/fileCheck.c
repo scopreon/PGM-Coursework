@@ -48,7 +48,7 @@ int magicNumberCheck(image *ptr_img,int magicNumberVerify){
 	 	(*ptr_img->magic_Number ==  MAGIC_NUMBER_ASCII_PGM && magicNumberVerify==2)){
 		/* if magic number does not match exit with bad magic number, free memory */
 		printf("ERROR: Bad Magic Number (%s)\n", ptr_img->fileName);
-		freeMemory(ptr_img);
+		//freeMemory(ptr_img);
 		return 1;
 	}
     else{
@@ -89,7 +89,7 @@ int getCommentLine(image *ptr_img){
 			if(count>127){
 				
 				printf("ERROR: Bad Comment Line (%s)\n",ptr_img->fileName);	
-				freeMemory(ptr_img);
+				//freeMemory(ptr_img);
 				return 1;
 			}
 		}
@@ -125,7 +125,7 @@ int sizeCheck(image *ptr_img,int scanCount){
 		/* free everything up if width/height aren't valid */
 		
 		printf("ERROR: Bad Dimensions (%s)\n", ptr_img->fileName);	
-		freeMemory(ptr_img);
+		//freeMemory(ptr_img);
 		return 1;
 	}
     else{
@@ -150,7 +150,7 @@ int grayCheck(image *ptr_img){
 		/* free memory and exit with string */
 		
 		printf("ERROR: Bad Max Gray Value (%s)\n", ptr_img->fileName);	
-		freeMemory(ptr_img);
+		//freeMemory(ptr_img);
 		return 1;
 	}
     else{
