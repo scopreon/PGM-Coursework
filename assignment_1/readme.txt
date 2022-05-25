@@ -1,10 +1,27 @@
-Usage of pgmEcho (echoes file from input to output):
-./pgmEcho input_file.pgm output_file.pgm
-Usage of pgmComp (compares input file and output file):
-./pgmComp input_file.pgm output_file.pgm
-Usage of pgma2b (convert ascii file to binary):
-./pgma2b input_file.pgm output_file.pgm
-Usage of pgmb2a (convert binary file to ascii):
-./pgmb2a input_file.pgm output_file.pgm
-Usage of pgmReduce (reduces file in size by factor n):
-./pgmReduce input_file.pgm factor output_file.pgm
+README
+
+Task: assignment_1
+Author: Saul Cooperman
+StudentID: 201492462
+
+pgmEcho
+    Copies a file from one location to another
+    Usage: ./pgmEcho inputImage.pgm outputImage.pgm
+pgmComp
+    Compares two files
+    Usage: ./pgmComp inputImage.pgm inputImage.pgm
+pgma2b
+    Converts ascii image to binary
+    Usage: ./pgma2b inputImage.pgm outputImage.pgm
+pgmb2a
+    Converts binary image to ascii
+    Usage: ./pgmb2a inputImage.pgm outputImage.pgm
+pgmReduce
+    Reduces image by a factor
+    Usage: ./pgmReduce inputImage.pgm reduction_factor outputImage.pgm
+pgmTile
+    Tiles an image into nxn tiles
+    Usage: ./pgmTile inputImage.pgm tiling_factor outputImage_<row>_<column>.pgm
+pgmAssemble
+    Assembles a larger image from smaller images
+    Usage: ./pgmAssemble outputImage.pgm width height (row column inputImage.pgm)+

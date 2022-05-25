@@ -1,0 +1,18 @@
+Tests:
+I.
+ - uneven dimensions of image
+ - illegal characters
+ - wrong magic number
+ - too large file
+
+II.
+ - decimal, integer = 0/negative
+ - mix of ascii and binary file
+ - convert binary to binary instead of ascii to binary, vice versa
+
+III.
+ - 
+
+IV.
+ - Letter for col/row in file name
+ - Wrong filename/doesn't exist

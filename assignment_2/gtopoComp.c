@@ -12,8 +12,10 @@
 /*                                 */
 /* CLI parameters:                 */
 /* argv[0]: executable name        */
-/* argv[1]: comp1 file name        */
-/* argv[2]: comp2 file name        */
+/* argv[1]: input file name        */
+/* argv[2]: input width            */
+/* argv[3]: input height           */
+/* argv[4]: output file name       */
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/

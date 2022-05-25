@@ -1,33 +1,21 @@
 #!/usr/bin/env bash
-# ./pgmEcho pepper.ascii.pgm temp0.pgm
-# ./pgma2b temp0.pgm temp1.pgm
-# ./pgmb2a temp1.pgm temp1.pgm
-
-# ./pgmComp pepper.ascii.pgm temp1.pgm
-# ./pgmReduce temp0.pgm 2 temp2.pgm
-
-#test for no arguments each program
-#test for not correct args each program >0
-#height too big
-#height too small
-#width too big
-#width too small
-#magic number 
 
 GREEN='\033[0;1;32m'
 RED='\033[0;31m'
+BLUE='\033[0;1;34m'
 NC='\033[0m' # No Color
-echo -e "UNIT TESTING FOR Programming Project\n"
-
+echo -e "UNIT TESTING FOR Programming Project Assignment 1\n"
+make clean > /dev/null 2>&1
+make > /dev/null 2>&1
 comparison(){
     if [ "$1" == "$2" ]
-then
-    echo -e "${GREEN}PASSED${NC}"
-else
-    echo -e "${RED}FAILED${NC}"
-    echo -e "\tExpected\t${1}"
-    echo -e "\tRecieved\t${2}"
-fi
+    then
+        echo -e "${GREEN}PASSED${NC}"
+    else
+        echo -e "${RED}FAILED${NC}"
+        echo -e "\tExpected\t${1}"
+        echo -e "\tRecieved\t${2}"
+    fi
 }
 
 #-----------------Testing for no arguments-----------------#
@@ -102,11 +90,13 @@ WHATWEWANT="ERROR: Bad Argument Count"
 WHATWEGET=$(./pgmReduce images/pepper.ascii.pgm)
 ./pgmReduce pepper.ascii.pgm > /dev/null 2>&1
 comparison "$WHATWEWANT" "$WHATWEGET"
+
 echo -n "Testing incorrect numbers of arguments for pgmTile: "
 WHATWEWANT="ERROR: Bad Argument Count"
 WHATWEGET=$(./pgmTile images/pepper.ascii.pgm)
 ./pgmReduce pepper.ascii.pgm > /dev/null 2>&1
 comparison "$WHATWEWANT" "$WHATWEGET"
+
 echo -n "Testing incorrect numbers of arguments for pgmAssemble: "
 WHATWEWANT="ERROR: Bad Argument Count"
 WHATWEGET=$(./pgmAssemble images/pepper.ascii.pgm)
@@ -115,7 +105,7 @@ comparison "$WHATWEWANT" "$WHATWEGET"
 echo
 #-----------------Testing formating, gray, width, height etc...-----------------#
 #-------------------------------Testing for echo--------------------------------#
-echo "Testing for pgmEcho"
+echo -e "Testing for ${BLUE}pgmEcho${NC}"
 echo -n "Testing comment line too big: "
 WHATWEWANT="ERROR: Bad Comment Line (images/pepper_CommentBig.pgm)"
 WHATWEGET=$(./pgmEcho images/pepper_CommentBig.pgm images/temp.pgm)
@@ -172,7 +162,7 @@ comparison "$WHATWEWANT" "$WHATWEGET"
 echo
 
 #-------------------------------Testing for comp--------------------------------#
-echo "Testing for pgmComp"
+echo -e "Testing for ${BLUE}pgmComp${NC}"
 echo -n "Testing comment line too big: "
 WHATWEWANT="ERROR: Bad Comment Line (images/pepper_CommentBig.pgm)"
 WHATWEGET=$(./pgmComp images/pepper_CommentBig.pgm images/temp.pgm)
@@ -226,10 +216,34 @@ WHATWEWANT="ERROR: Bad Data (images/pepper_ValueSmall.pgm)"
 WHATWEGET=$(./pgmEcho images/pepper_ValueSmall.pgm images/temp.pgm)
 ./pgmEcho pepper_ValueSmall.pgm temp.pgm > /dev/null 2>&1
 comparison "$WHATWEWANT" "$WHATWEGET"
+
+echo -n "Testing different ascii images: "
+WHATWEWANT="DIFFERENT"
+WHATWEGET=$(./pgmComp images/pepper_ascii.pgm images/pepper_Different_ascii.pgm)
+./pgmComp pepper.ascii.pgm pepper_Different.ascii.pgm > /dev/null 2>&1
+comparison "$WHATWEWANT" "$WHATWEGET"
+
+echo -n "Testing different binary images: "
+WHATWEWANT="DIFFERENT"
+WHATWEGET=$(./pgmComp images/pepper_binary.pgm images/pepper_Different_binary.pgm)
+./pgmComp pepper.ascii.pgm pepper_Different.ascii.pgm > /dev/null 2>&1
+comparison "$WHATWEWANT" "$WHATWEGET"
+
+echo -n "Testing identical ascii images: "
+WHATWEWANT="IDENTICAL"
+WHATWEGET=$(./pgmComp images/pepper_ascii.pgm images/pepper_ascii.pgm)
+./pgmComp pepper.ascii.pgm pepper.ascii.pgm > /dev/null 2>&1
+comparison "$WHATWEWANT" "$WHATWEGET"
+
+echo -n "Testing identical binary images: "
+WHATWEWANT="IDENTICAL"
+WHATWEGET=$(./pgmComp images/pepper_binary.pgm images/pepper_binary.pgm)
+./pgmComp pepper.binary.pgm pepper.binary.pgm > /dev/null 2>&1
+comparison "$WHATWEWANT" "$WHATWEGET"
 echo
 
 #-------------------------------Testing for a2b--------------------------------#
-echo "Testing for pgma2b"
+echo -e "Testing for ${BLUE}pgma2b${NC}"
 echo -n "Testing comment line too big: "
 WHATWEWANT="ERROR: Bad Comment Line (images/pepper_CommentBig.pgm)"
 WHATWEGET=$(./pgma2b images/pepper_CommentBig.pgm images/temp.pgm)
@@ -274,7 +288,7 @@ comparison "$WHATWEWANT" "$WHATWEGET"
 echo
 
 #-------------------------------Testing for b2a--------------------------------#
-echo "Testing for pgmb2a"
+echo -e "Testing for ${BLUE}pgmb2a${NC}"
 echo -n "Testing comment line too big: "
 WHATWEWANT="ERROR: Bad Comment Line (images/pepper_CommentBig.pgm)"
 WHATWEGET=$(./pgmb2a images/pepper_CommentBig.pgm images/temp.pgm)
@@ -319,7 +333,7 @@ comparison "$WHATWEWANT" "$WHATWEGET"
 echo
 
 #-------------------------------Testing for reduce--------------------------------#
-echo "Testing for pgmReduce"
+echo -e "Testing for ${BLUE}pgmReduce${NC}"
 echo -n "Testing comment line too big: "
 WHATWEWANT="ERROR: Bad Comment Line (images/pepper_CommentBig.pgm)"
 WHATWEGET=$(./pgmReduce images/pepper_CommentBig.pgm 2 images/temp.pgm)
@@ -376,7 +390,7 @@ comparison "$WHATWEWANT" "$WHATWEGET"
 echo
 
 #-------------------------------Testing for tile--------------------------------#
-echo "Testing for pgmTile"
+echo -e "Testing for ${BLUE}pgmTile${NC}"
 echo -n "Testing comment line too big: "
 WHATWEWANT="ERROR: Bad Comment Line (images/pepper_CommentBig.pgm)"
 WHATWEGET=$(./pgmTile images/pepper_CommentBig.pgm 2 "a_<row>_<column>.pgm")
@@ -433,7 +447,7 @@ comparison "$WHATWEWANT" "$WHATWEGET"
 echo
 
 #-------------------------------Testing for assemble--------------------------------#
-echo "Testing for pgmAssemble"
+echo -e "Testing for ${BLUE}pgmAssemble${NC}"
 echo -n "Testing comment line too big: "
 WHATWEWANT="ERROR: Bad Comment Line (images/pepper_CommentBig.pgm)"
 WHATWEGET=$(./pgmAssemble test.pgm 2 2 0 0 images/pepper_CommentBig.pgm)
@@ -488,42 +502,4 @@ WHATWEGET=$(./pgmAssemble test.pgm 2 2 0 0 images/pepper_ValueSmall.pgm)
 ./pgmEcho pepper_ValueSmall.pgm temp.pgm > /dev/null 2>&1
 comparison "$WHATWEWANT" "$WHATWEGET"
 echo
-
-#-----------------Reading in data error-----------------#
-echo -n "Testing data bigger than max gray: "
-WHATWEWANT="ERROR: Bad Data (images/pepper_ValueBig.pgm)"
-WHATWEGET=$(./pgmEcho images/pepper_ValueBig.pgm images/temp.pgm)
-./pgmEcho pepper_ValueBig.pgm temp.pgm > /dev/null 2>&1
-comparison "$WHATWEWANT" "$WHATWEGET"
-
-echo -n "Testing data smaller than 0: "
-WHATWEWANT="ERROR: Bad Data (images/pepper_ValueSmall.pgm)"
-WHATWEGET=$(./pgmEcho images/pepper_ValueSmall.pgm images/temp.pgm)
-./pgmEcho pepper_ValueSmall.pgm temp.pgm > /dev/null 2>&1
-comparison "$WHATWEWANT" "$WHATWEGET"
-
-#-----------------Testing pgmComp with same and different files-----------------#
-echo -n "Testing different ascii images: "
-WHATWEWANT="DIFFERENT"
-WHATWEGET=$(./pgmComp images/pepper_ascii.pgm images/pepper_Different_ascii.pgm)
-./pgmComp pepper.ascii.pgm pepper_Different.ascii.pgm > /dev/null 2>&1
-comparison "$WHATWEWANT" "$WHATWEGET"
-
-echo -n "Testing different binary images: "
-WHATWEWANT="DIFFERENT"
-WHATWEGET=$(./pgmComp images/pepper_binary.pgm images/pepper_Different_binary.pgm)
-./pgmComp pepper.ascii.pgm pepper_Different.ascii.pgm > /dev/null 2>&1
-comparison "$WHATWEWANT" "$WHATWEGET"
-
-echo -n "Testing identical ascii images: "
-WHATWEWANT="IDENTICAL"
-WHATWEGET=$(./pgmComp images/pepper_ascii.pgm images/pepper_ascii.pgm)
-./pgmComp pepper.ascii.pgm pepper.ascii.pgm > /dev/null 2>&1
-comparison "$WHATWEWANT" "$WHATWEGET"
-
-echo -n "Testing identical binary images: "
-WHATWEWANT="IDENTICAL"
-WHATWEGET=$(./pgmComp images/pepper_binary.pgm images/pepper_binary.pgm)
-./pgmComp pepper.binary.pgm pepper.binary.pgm > /dev/null 2>&1
-comparison "$WHATWEWANT" "$WHATWEGET"
 #endtesting

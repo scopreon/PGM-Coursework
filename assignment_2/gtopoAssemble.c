@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 	if (argc == 1)	
 	{
 		/* print error message if only 1 argument */
-		printf("Usage: %s outputFile width height (row column inputFile widthheight)+ \n", argv[0]);
+		printf("Usage: %s outputFile width height (row column inputFile width height)+\n", argv[0]);
 		/* return according error code */
 		return EXIT_NO_ERRORS;
 	}

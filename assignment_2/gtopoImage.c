@@ -94,7 +94,6 @@ int readData(image *ptr_img){
 	/* try read in another value, if this passes we have too much data */
 	/* check if too much data was read in, return bad input if it did */
 	if(fread(&grayValue,1,1,ptr_img->fileStream)!=0){	
-		printf("test");
 		return EXIT_BAD_INPUT;
 	}
     return 0;

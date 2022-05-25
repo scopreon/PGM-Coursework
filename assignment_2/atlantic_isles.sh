@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-rm *.txt
+make clean > /dev/null 2>&1
+make > /dev/null 2>&1
 ./gtopoReduce /vol/scratch/SoC/COMP1921/GTOPO30/gt30w020n90_dem/gt30w020n90.dem 4800 6000 25 test.dem
 ./gtopoAssemble test2.dem 288 288 12 96 test.dem 192 240
 ./gtopoTile test2.dem 288 288 4 "a<row><column>.dem"

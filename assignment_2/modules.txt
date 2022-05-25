@@ -1,0 +1,22 @@
+Rough notes on modules:
+Modules:
+
+1. checkFile
+	Module will be able to check the: magic number, dimensions, format and if the parsed file exists
+	3 functions: dimensions, fileExists
+	- dimensions makes sure the none of the dimensions of the file are negative or out of bounds, return 1 if valid, else 0
+	- fileExists will parse in filename and return 1 if the file exists, return 1 if valid, else 0
+
+2. writeFile
+	Module will generate a file and write a given line to a file
+	2 functions: generateFile, writeFile
+	- generateFile will parse in filename, format and dimensions and create a file with than name in the given directory, initialising it with image formatting, return 1 if successful else 0
+	- writeFile will write a line of text to any given line in a file (-1 if start of file), return 1 if successful else 0
+
+Program modules use:
+I  . 1,2
+II . 1,2,3
+III. 1,2
+IV . 1,2
+V  . 1,2,3
+VI . 1,2

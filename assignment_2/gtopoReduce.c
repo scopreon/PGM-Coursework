@@ -15,8 +15,10 @@
 /* CLI parameters:                 */
 /* argv[0]: executable name        */
 /* argv[1]: input file name        */
-/* argv[2]: reduction factor       */
-/* argv[3]: output file            */
+/* argv[2]: input width            */
+/* argv[3]: input height           */
+/* argv[4]: reduction factor       */
+/* argv[5]: output file            */
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/
@@ -27,7 +29,7 @@ int main(int argc, char **argv)
 	if (argc == 1)	
 	{
 		/* print error message if only 1 argument */
-		printf("Usage: %s width height reduction_factor output\n", argv[0]);
+		printf("Usage: %s input width height reduction_factor output\n", argv[0]);
 		/* return according error code */
 		return EXIT_NO_ERRORS;
 	}

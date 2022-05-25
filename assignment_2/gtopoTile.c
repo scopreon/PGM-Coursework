@@ -47,8 +47,10 @@ int stringExists(char *string, char *stringToFind){
 /* CLI parameters:                 */
 /* argv[0]: executable name        */
 /* argv[1]: input file name        */
-/* argv[2]: tiling factor          */
-/* argv[3]: output file            */
+/* argv[2]: input width            */
+/* argv[3]: input height           */
+/* argv[4]: tiling factor          */
+/* argv[5]: output file            */
 /* returns 0 on success            */
 /* non-zero error code on fail     */
 /***********************************/
@@ -59,7 +61,7 @@ int main(int argc, char **argv)
 	if (argc == 1)	
 	{
 		/* print error message if only 1 argument */
-		printf("Usage: %s inputFile width height tiling_factoroutputFile_<row>_<column>\n", argv[0]);
+		printf("Usage: %s inputFile width height tiling_factor outputFile_<row>_<column>\n", argv[0]);
 		/* return according error code */
 		return EXIT_NO_ERRORS;
 	}
